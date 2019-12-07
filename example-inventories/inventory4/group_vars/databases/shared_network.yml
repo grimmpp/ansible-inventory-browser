@@ -1,0 +1,8 @@
+---
+# Shared network settings 
+network_default_gateway: 10.132.132.1
+network_netmask: 255.255.255.192
+network_cidr: 12
+network_address: 10.132.132.0
+network_reverse_zone: 192.132.132.in-addr.arpa
+

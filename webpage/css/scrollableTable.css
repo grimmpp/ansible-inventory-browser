@@ -1,0 +1,98 @@
+.scrollableTableSection {
+  position: relative;
+  border: 1px solid darkgrey;
+  padding-top: 36px;
+  background: rgb(169, 211, 240);
+  top: 39px;
+  left: -1px;
+  width: 600px;
+  display: block;
+}
+
+.scrollableTableContainer {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background-color: white;
+  /* HEIGHT CAN BE SET HERE */
+  /* height: 500px; */
+}
+.scrollableTable {
+  border-spacing: 0;
+  width: 100%;
+  background: white;
+}
+
+.scrollableTable td  {
+  border: 1px solid rgb(200, 200, 200);
+  border-bottom: none;
+  border-left: none;
+
+  font-size: 10pt;
+
+  padding: 4px 4px;
+  padding-right: 30px;
+
+  cursor: pointer;
+}
+
+.scrollableTable th {
+  padding: 0px;
+  padding-left: 4px;
+  padding-right: 12px;
+  font-size: 10pt;
+  /* background: rgb(169, 211, 240); */
+}
+
+.scrollableTable th div{
+  position: absolute;
+  color: rgb(100,100,100);
+  padding: 9px 4px;
+  top: 0;
+  margin: 0 -5px;
+  line-height: normal;
+  border-left: 1px solid rgb(200, 200, 200);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.scrollableTableHeaderBackground {
+  background-image: url('black-unsorted.gif');
+  background-repeat: no-repeat;
+  background-position: center right;
+
+  cursor: pointer;
+}
+
+.scrollableTable th:first-child div{
+  border: none;
+}
+
+.scrollableTableCollapsed {
+  background-repeat: no-repeat;
+  background-position-y: center;
+  background-position-x: 0px;
+  background-image: url('collapsed.png')
+}
+
+.scrollableTableExpanded {
+  background-repeat: no-repeat;
+  background-position-y: center;
+  background-position-x: 0px;
+  background-image: url('collapsed.png')
+}
+
+.scrollableTable thead tr th.headerSortUp div {
+  background-image: url('black-desc.gif');
+  background-repeat: no-repeat;
+  background-position: center right;
+}
+
+.scrollableTable thead tr th.headerSortDown div {
+  background-image: url('black-asc.gif');
+  background-repeat: no-repeat;
+  background-position: center right;
+}
+
+.scrollableTableSelectedRow {
+ background-color: #acd7ff;
+}

@@ -1,0 +1,28 @@
+[ungrouped]
+
+[leafs]
+leaf01
+leaf02
+
+[spines]
+spine01
+spine02
+
+[network:children]
+leafs
+spines
+
+[webservers]
+webserver01
+webserver02
+
+[datacenter:children]
+network
+webservers
+test
+
+[test]
+leaf01
+localhost              ansible_connection=local
+other1.example.com     ansible_connection=ssh        ansible_user=myuser
+other2.example.com     ansible_connection=ssh        ansible_user=myotheruser

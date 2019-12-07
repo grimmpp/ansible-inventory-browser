@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html">
+  <title>Simple Table Sorting with jQuery - Treehouse Demo</title>
+  <meta name="author" content="Jake Rocheleau">
+  <link rel="shortcut icon" href="http://d15dxvojnvxp1x.cloudfront.net/assets/favicon.ico">
+  <link rel="icon" href="http://d15dxvojnvxp1x.cloudfront.net/assets/favicon.ico">
+
+  <link rel="stylesheet" type="text/css" media="all" href="css/styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/scrollableTable.css">
+  
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <!-- https://github.com/Mottie/tablesorter/wiki -->
+  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+  <!-- https://mottie.github.io/tablesorter/docs/#Demo -->
+  <script type="text/javascript" src="js/scrollableTable.js"></script>
+
+  <script type="text/javascript" src="generated-data/data.js"></script>
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <div id="buttonBar">
+            <button id="btHosts">Hosts</button>
+            <button id="btGroups">Groups</button>
+            <button id="btAnalyse">Result of Analysis</button>
+            <button id="btJSON">Show all Data as JSON</button>
+        </div>
+        <pre id="detailView" ></pre>
+    </div>
+
+    <script type="text/javascript">
+        var scrollableTable = new scrollableTable('scrollableTable', 'wrapper')
+        scrollableTable.setTableHeight( () => { return $( window ).height() - 118 } )
+
+        // console.log(data); 
+        // $('#detailView').html( JSON.stringify( data, null, 4) )
+
+        $('#btJSON').click( function() {
+            scrollableTable.clearTable()
+            $('#detailView').html( JSON.stringify( data, null, 4) )
+        })
+
+        
+
+        $('#btHosts').click( function() {
+            $('#detailView').text("")
+            
+            scrollableTable.setTableHeader(["Hostname", "Groups", "Ansible Host IP", "Environment"])
+            scrollableTable.setTableContent(data["hosts"], "selectedHost", ["name", "groups", "IPv4-Address", "environment_label"])
+        })
+
+        $( document ).on("selectedHost", function(event, host) {
+            if (host !== "") {
+                $('#detailView').html( JSON.stringify( data["hosts"][host], null, 4) )
+            } else {
+                $('#detailView').html("")
+            }
+        });
+
+
+
+        $('#btGroups').click( function() {
+            $('#detailView').text("")
+            
+            scrollableTable.setTableHeader(["Group Name", "Hosts", "Environment", "Inventory"])
+            scrollableTable.setTableContent(data["groups"], "selectedGroup", ["name","host-count", "environment_label", "inventory"])
+            // scrollableTable.setTreeTableContent( data["groupTree"], "selectedGroup", ["name","host-count", "environment-label"], "subgroups")
+            // scrollableTable.expandTree()
+        })
+
+        $( document ).on("selectedGroup", function(event, group) {
+            if (group !== "") {
+                $('#detailView').html( JSON.stringify( data["groups"][group], null, 4) )
+            } else {
+                $('#detailView').html("")
+            }
+        });
+
+        // $( document ).on("selectedGroup", function(event, nestedIndex) {
+        //     console.log(JSON.stringify(nestedIndex))
+
+        //     try {
+        //         var object = data["groupTree"][nestedIndex[0]]
+        //         for(var i=1; i<nestedIndex.length; i++) { object = object.subgroups[nestedIndex[i]] }
+        //         $('#detailView').html( JSON.stringify( object, null, 4) )
+        //     } catch(e) {
+        //         console.error(e)
+        //         $('#detailView').html("")
+        //     }
+        // });
+
+
+
+        $('#btAnalyse').click( function() {
+            $('#detailView').text("")
+            
+            scrollableTable.setTableHeader(["Issue", "Resource Type", "Resource","Inventory"])
+            scrollableTable.setTableContent(data["messages"], "selectedMessage", ["issue", "resourceType","resource","inventory"])
+        })
+
+        $( document ).on("selectedMessage", function(event, message) {
+            if (message !== "") {
+                $('#detailView').html( JSON.stringify( data["messages"][message]["details"], null, 4) )
+            } else {
+                $('#detailView').html("")
+            }
+        });
+
+        // Lost hosts
+        $('#btHosts').trigger( "click" );
+
+    </script>
+ 
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "inventory-initializer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "read-ini-file": "^2.0.0",
+    "yaml": "^1.7.2",
+    "yargs": "^15.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Philipp Grimm",
+  "license": "ISC"
+}

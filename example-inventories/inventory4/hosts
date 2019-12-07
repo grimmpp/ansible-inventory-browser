@@ -1,0 +1,14 @@
+[databases]
+database01
+database02
+database03
+
+[webservers]
+webserver01
+webserver02
+webserver03
+webserver04  ansible_port=5555 ansible_host=192.0.2.50
+
+[datacenter:children]
+databases
+webservers

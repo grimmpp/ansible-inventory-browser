@@ -1,0 +1,12 @@
+
+rhv_create_vms_description: "webserver"
+
+rhv_create_vms_rhv_role: rhv-guest
+rhv_create_vms_vcpus: 1
+rhv_create_vms_memory: 2048
+rhv_create_vms_cluster: 'WS1'
+rhv_create_vms_disks:
+  system:
+    rhv_create_vms_storage_domain: "hosted_storage"
+    rhv_create_vms_size: 30
+    rhv_create_vms_bootdisk: true
