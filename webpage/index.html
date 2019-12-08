@@ -44,13 +44,13 @@
             $('#detailView').html( JSON.stringify( data, null, 4) )
         })
 
-        
+
 
         $('#btHosts').click( function() {
             $('#detailView').text("")
-            
-            scrollableTable.setTableHeader(["Hostname", "Groups", "Ansible Host IP", "Environment"])
-            scrollableTable.setTableContent(data["hosts"], "selectedHost", ["name", "groups", "IPv4-Address", "environment_label"])
+            var tableConfig = data['ui-config']['host-view']
+            scrollableTable.setTableHeader(tableConfig['header'])
+            scrollableTable.setTableContent(data["hosts"], tableConfig['event-type'], tableConfig['columns'])
         })
 
         $( document ).on("selectedHost", function(event, host) {
@@ -65,9 +65,9 @@
 
         $('#btGroups').click( function() {
             $('#detailView').text("")
-            
-            scrollableTable.setTableHeader(["Group Name", "Hosts", "Environment", "Inventory"])
-            scrollableTable.setTableContent(data["groups"], "selectedGroup", ["name","host-count", "environment_label", "inventory"])
+            var tableConfig = data['ui-config']['group-view']
+            scrollableTable.setTableHeader(tableConfig['header'])
+            scrollableTable.setTableContent(data["hosts"], tableConfig['event-type'], tableConfig['columns'])
             // scrollableTable.setTreeTableContent( data["groupTree"], "selectedGroup", ["name","host-count", "environment-label"], "subgroups")
             // scrollableTable.expandTree()
         })
@@ -97,9 +97,9 @@
 
         $('#btAnalyse').click( function() {
             $('#detailView').text("")
-            
-            scrollableTable.setTableHeader(["Issue", "Resource Type", "Resource","Inventory"])
-            scrollableTable.setTableContent(data["messages"], "selectedMessage", ["issue", "resourceType","resource","inventory"])
+            var tableConfig = data['ui-config']['message-view']
+            scrollableTable.setTableHeader(tableConfig['header'])
+            scrollableTable.setTableContent(data["messages"], tableConfig['event-type'], tableConfig['columns'])
         })
 
         $( document ).on("selectedMessage", function(event, message) {
@@ -110,7 +110,7 @@
             }
         });
 
-        // Lost hosts
+        // Show host view
         $('#btHosts').trigger( "click" );
 
     </script>

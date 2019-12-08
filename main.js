@@ -42,7 +42,8 @@ function generateData() {
     data["groups"] = []
     data["messages"] = []
 
-    var inventoryConfig = JSON.parse( fs.readFileSync( inventoryConfigFilename, 'utf8') )
+    var config = JSON.parse( fs.readFileSync( inventoryConfigFilename, 'utf8') )
+    var inventoryConfig = config['inventory-config']
     var inventories = []
 
     for (var index in inventoryConfig) {
@@ -80,6 +81,7 @@ function generateData() {
         data["groups"].push.apply(data["groups"], Object.values(inv.flatGroupList))
     }
 
+    data["ui-config"] = config['ui-config']
     data["messages"].push.apply(data["messages"], Message.getAllCreatedMessages())
 
     // console.dir(inventories)
