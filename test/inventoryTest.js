@@ -53,6 +53,11 @@ describe('#inventoryTest()', function() {
         expect( Object.keys(hosts.find(h => h.name == 'other2.example.com').variables).length ).to.equal(2)
         expect( hosts.find(h => h.name == 'other2.example.com').variables['ansible_connection'] ).to.equal('ssh')
         expect( hosts.find(h => h.name == 'other2.example.com').variables['ansible_user'] ).to.equal('myotheruser')
+
+        const hostsWithoutVariables = ['leaf01','leaf02','spine01','spine01','webserver01','webserver02']
+        for(var i in hostsWithoutVariables) {
+            expect( Object.keys( hosts.find(h => h.name == hostsWithoutVariables[i]).variables ).length  ).to.equal(0)
+        }
     })
 
     it('check groups for inventory1', function() {
@@ -61,8 +66,21 @@ describe('#inventoryTest()', function() {
         expect(groups.length).to.equal(groupCount)
 
         const groupnames = ['ungrouped','leafs','spines','network','webservers','datacenter','test','all']
+        expect( groupnames.length ).to.equal(groupCount)
         for(var i in groupnames) {
             expect( groups.map(g => g.name).includes(groupnames[i]) ).to.be.true
         }
+
+        const emptySubgroups = ['ungrouped','leafs','spines','webservers','test']
+        for(var i in emptySubgroups) {
+            expect( groups.find(g => g.name == emptySubgroups[i]).subgroups.length ).to.equal(0)
+        }
+
+        const parentGroups = ['all','datacenter','network']
+        for(var i in parentGroups) {
+            expect( groups.find(g => g.name == parentGroups[i]).subgroups.length ).greaterThan(0)
+        }
+
+        expect( emptySubgroups.length + parentGroups.length ).to.equal(groupCount)
     })
 })
