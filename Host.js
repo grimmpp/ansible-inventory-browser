@@ -54,7 +54,8 @@ class Host {
 
                         // get variables out of the same line like the host name
                         var variables = Host.removeHostnameOfVariables(hostname +"="+ hostsIni[groupName][hostname])
-                        var splittedVars = variables.split(' ')
+                        var splittedVars = variables.split(' ').filter(e => e.length > 0)
+
                         for(var i in splittedVars) {
                             var keyValuePair = splittedVars[i].split('=')
                             hostList[_hostname].variables[keyValuePair[0]] = keyValuePair[1]

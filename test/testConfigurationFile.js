@@ -6,11 +6,11 @@ chai.use(require('chai-string'));
 const expect = chai.expect
 
 
-describe('#inventoryConfigTest()', function() {
+describe('#testConfigurationFileValidation()', function() {
     
     var config = {}
 
-    beforeEach(function() {
+    before(function() {
         var inventoryConfigFilename = path.join(".", "inventory.conf")
         config = JSON.parse( fs.readFileSync( inventoryConfigFilename, 'utf8') )
     })
