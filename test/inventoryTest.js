@@ -6,6 +6,10 @@ const DataGenerator = require('../DataGenerator.js')
 
 describe('#inventoryTest()', function() {
     
+    function findHostByName(hosts, hostname) {
+        return hosts.find(h => h.name == hostname)
+    }
+
     var inventoryFile = "./inventory.conf"
     var data ={}
 
@@ -42,7 +46,7 @@ describe('#inventoryTest()', function() {
 
         const hostnames = ['leaf01','leaf02','spine01','spine01','webserver01','webserver02','localhost','other1.example.com','other2.example.com']
         for(var i in hostnames) {
-            var host = hosts.find(h => h.name == hostnames[i])
+            var host = findHostByName(hosts, hostnames[i])
             expect( host ).not.undefined
             
             expect( host ).property('environment_label')
@@ -54,18 +58,24 @@ describe('#inventoryTest()', function() {
             expect( hosts.map(h => h.name).includes(hostnames[i]) ).to.be.true
         }
 
-        expect( Object.keys(hosts.find(h => h.name == 'localhost').variables).length ).to.equal(1)
-        expect( hosts.find(h => h.name == 'localhost').variables['ansible_connection'] ).to.equal('local')
-        expect( Object.keys(hosts.find(h => h.name == 'other1.example.com').variables).length ).to.equal(2)
-        expect( hosts.find(h => h.name == 'other1.example.com').variables['ansible_connection'] ).to.equal('ssh')
-        expect( hosts.find(h => h.name == 'other1.example.com').variables['ansible_user'] ).to.equal('myuser')
-        expect( Object.keys(hosts.find(h => h.name == 'other2.example.com').variables).length ).to.equal(2)
-        expect( hosts.find(h => h.name == 'other2.example.com').variables['ansible_connection'] ).to.equal('ssh')
-        expect( hosts.find(h => h.name == 'other2.example.com').variables['ansible_user'] ).to.equal('myotheruser')
+        var host = findHostByName(hosts, 'localhost')
+        expect( Object.keys( host.variables).length ).to.equal(1)
+        expect( host.variables['ansible_connection'] ).to.equal('local')
+
+        host = findHostByName(hosts, 'other1.example.com')
+        expect( Object.keys( host.variables).length ).to.equal(2)
+        expect( host.variables['ansible_connection'] ).to.equal('ssh')
+        expect( host.variables['ansible_user'] ).to.equal('myuser')
+
+        host = findHostByName(hosts, 'other2.example.com')
+        expect( Object.keys( host.variables).length ).to.equal(2)
+        expect( host.variables['ansible_connection'] ).to.equal('ssh')
+        expect( host.variables['ansible_user'] ).to.equal('myotheruser')
 
         const hostsWithoutVariables = ['leaf01','leaf02','spine01','spine01','webserver01','webserver02']
         for(var i in hostsWithoutVariables) {
-            expect( Object.keys( hosts.find(h => h.name == hostsWithoutVariables[i]).variables ).length  ).to.equal(0)
+            host = findHostByName(hosts, hostsWithoutVariables[i])
+            expect( Object.keys( host.variables ).length ).to.equal(0)
         }
 
     })
