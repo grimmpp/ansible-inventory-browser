@@ -42,6 +42,15 @@ describe('#inventoryTest()', function() {
 
         const hostnames = ['leaf01','leaf02','spine01','spine01','webserver01','webserver02','localhost','other1.example.com','other2.example.com']
         for(var i in hostnames) {
+            var host = hosts.find(h => h.name == hostnames[i])
+            expect( host ).not.undefined
+            
+            expect( host ).property('environment_label')
+            expect( host.environment_label ).to.equal('env1')
+
+            expect( host ).property('inventory')
+            expect( host.inventory ).to.equal('inventory1')
+
             expect( hosts.map(h => h.name).includes(hostnames[i]) ).to.be.true
         }
 
@@ -58,6 +67,7 @@ describe('#inventoryTest()', function() {
         for(var i in hostsWithoutVariables) {
             expect( Object.keys( hosts.find(h => h.name == hostsWithoutVariables[i]).variables ).length  ).to.equal(0)
         }
+
     })
 
     it('check groups for inventory1', function() {
