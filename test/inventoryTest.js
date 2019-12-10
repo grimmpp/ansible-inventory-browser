@@ -166,6 +166,8 @@ describe('#inventoryTest()', function() {
         for(var i in groupnames) {
             expect( groups.map(g => g.name).includes(groupnames[i]) ).to.be.true
         }
+        expect( groups.find(g => g.name == 'atlanta').hostnames.includes('host1') ).to.be.true
+        expect( groups.find(g => g.name == 'atlanta').hostnames.includes('host2') ).to.be.true
 
         const emptySubgroups = ['atlanta', 'raleigh', 'northeast', 'southwest', 'northwest', 'ungrouped']
         for(var i in emptySubgroups) {

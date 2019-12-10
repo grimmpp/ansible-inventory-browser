@@ -20,11 +20,13 @@ class TreeBuilder {
             var subnode = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatGroupList, node.inventory, node.subgroups[i]))
     
             TreeBuilder.internal_addSubgroupsToNode(flatGroupList, flatHostList, subnode)
+            subnode.variables = Object.assign(subnode.variables, node.variables)
             node.nodes.push(subnode)
         }
 
         for (var i in node.hostnames) {
             var host = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatHostList, node.inventory, node.hostnames[i]))
+            host.variables = Object.assign(host.variables, node.variables)
             node.nodes.push(host)
         }
     }

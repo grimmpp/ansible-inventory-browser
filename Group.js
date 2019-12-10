@@ -58,10 +58,7 @@ class Group {
             if (Group.hasHosts(groupName)) {
                 // add hostnames
                 for(var hostname in hostsIni[groupName]) {
-                    // check if hostname is valid
-                    if (Group.isValidHostname(hostname)) {
-                        groupList[_groupName].hostnames.push(hostname)
-                    }
+                    groupList[_groupName].hostnames.push(hostname.split(' ')[0])
                 }
             }
             else if (Group.hasSubgroups(groupName)) {
