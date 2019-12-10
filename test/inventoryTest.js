@@ -24,7 +24,7 @@ describe('#inventoryTest()', function() {
     })
 
     it('check flat group list', function() {
-        const groupCount = 36
+        const groupCount = 39
         expect(data).property('groups')
         expect(data['groups'].length).to.equal(groupCount)
     })
@@ -41,7 +41,9 @@ describe('#inventoryTest()', function() {
 
     it('check hosts for inventory1', function() {
         const hostCount = 9
-        var hosts = data['hosts'].filter(h => h.inventory == 'inventory1')
+        const inventoryName = 'inventory1'
+        const envName = 'env1'
+        var hosts = data['hosts'].filter(h => h.inventory == inventoryName)
         expect(hosts.length).to.equal(hostCount)
 
         const hostnames = ['leaf01','leaf02','spine01','spine01','webserver01','webserver02','localhost','other1.example.com','other2.example.com']
@@ -50,10 +52,10 @@ describe('#inventoryTest()', function() {
             expect( host ).not.undefined
             
             expect( host ).property('environment_label')
-            expect( host.environment_label ).to.equal('env1')
+            expect( host.environment_label ).to.equal(envName)
 
             expect( host ).property('inventory')
-            expect( host.inventory ).to.equal('inventory1')
+            expect( host.inventory ).to.equal(inventoryName)
 
             expect( hosts.map(h => h.name).includes(hostnames[i]) ).to.be.true
         }
@@ -77,12 +79,13 @@ describe('#inventoryTest()', function() {
             host = findHostByName(hosts, hostsWithoutVariables[i])
             expect( Object.keys( host.variables ).length ).to.equal(0)
         }
-
     })
 
     it('check groups for inventory1', function() {
         const groupCount = 8
-        var groups = data['groups'].filter(h => h.inventory == 'inventory1')
+        const inventoryName = 'inventory1'
+        
+        var groups = data['groups'].filter(h => h.inventory == inventoryName)
         expect(groups.length).to.equal(groupCount)
 
         const groupnames = ['ungrouped','leafs','spines','network','webservers','datacenter','test','all']
@@ -97,6 +100,78 @@ describe('#inventoryTest()', function() {
         }
 
         const parentGroups = ['all','datacenter','network']
+        for(var i in parentGroups) {
+            expect( groups.find(g => g.name == parentGroups[i]).subgroups.length ).greaterThan(0)
+        }
+
+        expect( emptySubgroups.length + parentGroups.length ).to.equal(groupCount)
+    })
+
+    it('check hosts for inventory2', function() {
+        const hostCount = 4
+        const inventoryName = 'inventory2'
+        const envName = 'env2'
+        var hosts = data['hosts'].filter(h => h.inventory == inventoryName)
+        expect(hosts.length).to.equal(hostCount)
+
+        const hostnames = ['host1','host2','host3','jumper']
+        for(var i in hostnames) {
+            var host = findHostByName(hosts, hostnames[i])
+            expect( host ).not.undefined
+            
+            expect( host ).property('environment_label')
+            expect( host.environment_label ).to.equal(envName)
+
+            expect( host ).property('inventory')
+            expect( host.inventory ).to.equal(inventoryName)
+
+            expect( hosts.map(h => h.name).includes(hostnames[i]) ).to.be.true
+        }
+
+        var host = findHostByName(hosts, 'host1')
+        expect( Object.keys( host.variables).length ).to.equal(3)
+        expect( host.variables['http_port'] ).to.equal('80')
+        expect( host.variables['maxRequestsPerChild'] ).to.equal('808')
+        expect( host.variables['ssh_port'] ).to.equal('22')
+
+        host = findHostByName(hosts, 'host2')
+        expect( Object.keys( host.variables).length ).to.equal(2)
+        expect( host.variables['http_port'] ).to.equal('303')
+        expect( host.variables['maxRequestsPerChild'] ).to.equal('909')
+
+        host = findHostByName(hosts, 'host3')
+        expect( Object.keys( host.variables).length ).to.equal(0)
+
+        host = findHostByName(hosts, 'jumper')
+        expect( Object.keys( host.variables).length ).to.equal(2)
+        expect( host.variables['ansible_port'] ).to.equal('5555')
+        expect( host.variables['ansible_host'] ).to.equal('192.0.2.50')
+
+        const hostsWithoutVariables = ['host3']
+        for(var i in hostsWithoutVariables) {
+            host = findHostByName(hosts, hostsWithoutVariables[i])
+            expect( Object.keys( host.variables ).length ).to.equal(0)
+        }
+    })
+
+    it('check groups for inventory2', function() {
+        const groupCount = 9
+        const inventoryName = 'inventory2'
+        
+        var groups = data['groups'].filter(h => h.inventory == inventoryName)
+        expect(groups.length).to.equal(groupCount)
+
+        const groupnames = ['atlanta', 'raleigh', 'southeast', 'usa', 'northeast', 'southwest', 'northwest', 'all', 'ungrouped']
+        expect( groupnames.length ).to.equal(groupCount)
+        for(var i in groupnames) {
+            expect( groups.map(g => g.name).includes(groupnames[i]) ).to.be.true
+        }
+
+        const emptySubgroups = ['atlanta', 'raleigh', 'northeast', 'southwest', 'northwest', 'ungrouped']
+        for(var i in emptySubgroups) {
+            expect( groups.find(g => g.name == emptySubgroups[i]).subgroups.length ).to.equal(0)
+        }
+        const parentGroups = ['all','usa','southeast']
         for(var i in parentGroups) {
             expect( groups.find(g => g.name == parentGroups[i]).subgroups.length ).greaterThan(0)
         }

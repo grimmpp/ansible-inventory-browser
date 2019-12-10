@@ -6,6 +6,7 @@ const Group = require('./Group.js')
 const Host = require('./Host.js')
 const ResourceHelper = require('./ResourceHelper.js')
 const Inventory = require('./Inventory.js')
+const TreeBuilder = require('./TreeBuilder.js')
 
 const colorG = "\x1b[32m"
 const colorB = "\x1b[34m"
@@ -62,6 +63,7 @@ class DataGenerator {
         data["ui-config"] = config['ui-config']
         data["messages"].push.apply(data["messages"], Message.getAllCreatedMessages())
     
+        data["trees"] = TreeBuilder.build(data["groups"], data["hosts"])
         // console.dir(inventories)
         // console.dir(data["hosts"])
         // console.dir(data["groups"])

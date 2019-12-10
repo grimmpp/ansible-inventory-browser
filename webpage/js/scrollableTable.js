@@ -203,7 +203,7 @@ var scrollableTable = function(id, wrapperId) {
             if (data[index][subtreePropertyName] !== undefined && data[index][subtreePropertyName].length > 0 ) {
                 const fristTdElem = trElem.children().first();
                 
-                fristTdElem.removeClass("scrollableTableExpanded")
+                // fristTdElem.removeClass("scrollableTableExpanded")
                 fristTdElem.addClass("scrollableTableCollapsed")
                 fristTdElem.attr('style', 'padding-left: '+distText+'px; background-position-x: '+distIcon+'px; ')
                 trElem.attr('status', 'closed')
@@ -227,6 +227,8 @@ var scrollableTable = function(id, wrapperId) {
 
                     } else {
                         closeSubRows(rowId)
+                        fristTdElem.removeClass("scrollableTableExpanded")
+                        fristTdElem.addClass("scrollableTableCollapsed")
                     }
 
                     root.adjustHeaderSize() 

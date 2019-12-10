@@ -68,6 +68,10 @@ class Group {
                 // add subgroups
                 for(var subGroupName in hostsIni[groupName]) {
                     groupList[_groupName].subgroups.push(subGroupName)
+                    // need to add goups here as well because they may be listed only as subgroups
+                    if (groupList[subGroupName] === undefined) {
+                        groupList[subGroupName] = new Group(inventory, environment, subGroupName)
+                    }
                 }
             } else if (Group.hasGroupVariables(groupName)) {
                 // add variables from the hosts ini-file
