@@ -18,10 +18,9 @@ class TreeBuilder {
         node.nodes = []
         for (var i in node.subgroups) {
             var subnode = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatGroupList, node.inventory, node.subgroups[i]))
-    
-            TreeBuilder.internal_addSubgroupsToNode(flatGroupList, flatHostList, subnode)
             subnode.variables = Object.assign(subnode.variables, node.variables)
             node.nodes.push(subnode)
+            TreeBuilder.internal_addSubgroupsToNode(flatGroupList, flatHostList, subnode)
         }
 
         for (var i in node.hostnames) {
