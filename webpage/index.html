@@ -69,7 +69,7 @@
             scrollableTable.setTableHeader(tableConfig['header'])
             // scrollableTable.setTableContent(data["groups"], tableConfig['event-type'], tableConfig['columns'])
 
-            scrollableTable.setTreeTableContent( data["trees"], "selectedGroup", ["name", "host-count", "environment_label", "inventory"], "nodes")
+            scrollableTable.setTreeTableContent( data["trees"], "selectedGroup", ["name", "host-count", "type", "environment_label", "inventory"], "nodes")
             // scrollableTable.expandTree()
         })
 
