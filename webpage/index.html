@@ -36,6 +36,16 @@
         var scrollableTable = new scrollableTable('scrollableTable', 'wrapper')
         scrollableTable.setTableHeight( () => { return $( window ).height() - 118 } )
 
+        function updateTable(tableConfig, data) {
+            scrollableTable.setTableHeader(tableConfig['header'])
+            if (tableConfig['subtreeProperty'] === undefined) {
+                scrollableTable.setTableContent(data, tableConfig['event-type'], tableConfig['columns'])
+            } else {
+                scrollableTable.setTreeTableContent(data, tableConfig['event-type'], tableConfig['columns'], tableConfig['subtreeProperty'])
+                scrollableTable.expandTree()
+            }
+        }
+
         // console.log(data); 
         // $('#detailView').html( JSON.stringify( data, null, 4) )
 
@@ -49,8 +59,7 @@
         $('#btHosts').click( function() {
             $('#detailView').text("")
             var tableConfig = data['ui-config']['host-view']
-            scrollableTable.setTableHeader(tableConfig['header'])
-            scrollableTable.setTableContent(data["hosts"], tableConfig['event-type'], tableConfig['columns'])
+            updateTable(tableConfig, data['hosts'])
         })
 
         $( document ).on("selectedHost", function(event, host) {
@@ -62,15 +71,10 @@
         });
 
 
-
         $('#btGroups').click( function() {
             $('#detailView').text("")
             var tableConfig = data['ui-config']['group-view']
-            scrollableTable.setTableHeader(tableConfig['header'])
-            // scrollableTable.setTableContent(data["groups"], tableConfig['event-type'], tableConfig['columns'])
-
-            scrollableTable.setTreeTableContent( data["trees"], "selectedGroup", ["name", "host-count", "type", "environment_label", "inventory"], "nodes")
-            // scrollableTable.expandTree()
+            updateTable(tableConfig, data['trees'])
         })
 
         // $( document ).on("selectedGroup", function(event, group) {
@@ -101,8 +105,7 @@
         $('#btAnalyse').click( function() {
             $('#detailView').text("")
             var tableConfig = data['ui-config']['message-view']
-            scrollableTable.setTableHeader(tableConfig['header'])
-            scrollableTable.setTableContent(data["messages"], tableConfig['event-type'], tableConfig['columns'])
+            updateTable(tableConfig, data['messages'])
         })
 
         $( document ).on("selectedMessage", function(event, message) {
