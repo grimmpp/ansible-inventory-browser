@@ -5,6 +5,7 @@ var scrollableTable = function(id, wrapperId) {
     var lastSelectedRow = ""
     var lastRowId = -1
     var isTreeTable = false
+    var autoExpandOrCollapse = false
 
     var create = function() {
         $('<section>').addClass("scrollableTableSection").append(
@@ -64,15 +65,17 @@ var scrollableTable = function(id, wrapperId) {
     }
 
     this.selectTreeTableRow = function(rowId, triggerEventName, nestedIndex) {
-        if (lastSelectedRow != rowId) {
-            if (lastSelectedRow != "") {
-                $('#'+lastSelectedRow).children().removeClass("scrollableTableSelectedRow")
+        if (!(autoExpandOrCollapse)) {
+            if (lastSelectedRow != rowId) {
+                if (lastSelectedRow != "") {
+                    $('#'+lastSelectedRow).children().removeClass("scrollableTableSelectedRow")
+                }
+
+                $("#"+rowId).children().addClass("scrollableTableSelectedRow")
+                lastSelectedRow = rowId
+
+                $( document ).trigger( triggerEventName, [ nestedIndex ] )
             }
-
-            $("#"+rowId).children().addClass("scrollableTableSelectedRow")
-            lastSelectedRow = rowId
-
-            $( document ).trigger( triggerEventName, [ nestedIndex ] )
         }
     }
 
@@ -90,19 +93,23 @@ var scrollableTable = function(id, wrapperId) {
     }
 
     this.collapseTree = function() {
+        autoExpandOrCollapse = true
         while ($( "tr[status='open']" ).length > 0) {
             $( "tr[status='closed']" ).each(function(index, elem) {
                 elem.click()
             })
         }
+        autoExpandOrCollapse = false
     }
 
     this.expandTree = function() {
+        autoExpandOrCollapse = true
         while ($( "tr[status='closed']" ).length > 0) {
             $( "tr[status='closed']" ).each(function(index, elem) {
                 elem.click()
             })
         }
+        autoExpandOrCollapse = false
     }
 
     this.setTableHeader = function(names) {
@@ -208,27 +215,32 @@ var scrollableTable = function(id, wrapperId) {
                 fristTdElem.attr('style', 'padding-left: '+distText+'px; background-position-x: '+distIcon+'px; ')
                 trElem.attr('status', 'closed')
 
-                trElem.click(() => {
+                trElem.click(function(event) {
+                    var cursorPos = event.clientX - fristTdElem.offset().left - distIcon
+                    var clickedOnIcon = (cursorPos < 16 && cursorPos >= 0)
+
                     const subtreeData = data[index][subtreePropertyName]
                     // const _rowId = rowId
                     // const _level = level+1
 
-                    if ($('#'+rowId).attr('status') == 'closed') {
-                        $('#'+rowId).attr('status', 'open')
-                        // Fill content
-                        for (var i=subtreeData.length-1; i>=0; i--) {
-                            var _indexes = []
-                            parentIndexes.forEach(function(_i){ _indexes.push(_i)})
-                            _indexes.push(i)
-                            createChildRow(subtreeData, i, eventType, columns, subtreePropertyName, trElem, rowId, level+1, _indexes)
-                        }
-                        fristTdElem.addClass("scrollableTableExpanded")
-                        fristTdElem.removeClass("scrollableTableCollapsed")
+                    if (clickedOnIcon || autoExpandOrCollapse) {
+                        if ($('#'+rowId).attr('status') == 'closed') {
+                            $('#'+rowId).attr('status', 'open')
+                            // Fill content
+                            for (var i=subtreeData.length-1; i>=0; i--) {
+                                var _indexes = []
+                                parentIndexes.forEach(function(_i){ _indexes.push(_i)})
+                                _indexes.push(i)
+                                createChildRow(subtreeData, i, eventType, columns, subtreePropertyName, trElem, rowId, level+1, _indexes)
+                            }
+                            fristTdElem.addClass("scrollableTableExpanded")
+                            fristTdElem.removeClass("scrollableTableCollapsed")
 
-                    } else {
-                        closeSubRows(rowId)
-                        fristTdElem.removeClass("scrollableTableExpanded")
-                        fristTdElem.addClass("scrollableTableCollapsed")
+                        } else {
+                            closeSubRows(rowId)
+                            fristTdElem.removeClass("scrollableTableExpanded")
+                            fristTdElem.addClass("scrollableTableCollapsed")
+                        }
                     }
 
                     root.adjustHeaderSize() 
