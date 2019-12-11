@@ -4,7 +4,7 @@ class TreeBuilder {
         var trees = [] 
         
         for(var i in flatGroupList) {
-            if (flatGroupList[i].name == 'all') {
+            if (flatGroupList[i].name == 'all' || flatGroupList[i].name == 'ungrouped') {
                 var node = TreeBuilder._internal_cloneObject(flatGroupList[i])
                 TreeBuilder.internal_addSubgroupsToNode(flatGroupList, flatHostList, node)
                 trees.push( node )
