@@ -11,6 +11,8 @@ class TreeBuilder {
             }
         }
 
+        TreeBuilder.internal_sortRootNodes(trees)
+
         return trees
     }
 
@@ -36,6 +38,17 @@ class TreeBuilder {
 
     static _internal_cloneObject(obj) {
         return JSON.parse(JSON.stringify(obj))
+    }
+
+    static internal_sortRootNodes(trees){
+
+        for(var i=0; i<trees.length; i+=2) {
+            if (trees[i].name != 'all') {
+                var temp = trees[i]
+                trees[i] = trees[i+1]
+                trees[i+1] = temp
+            }
+        }
     }
 }
 

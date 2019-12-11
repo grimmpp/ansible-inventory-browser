@@ -27,6 +27,15 @@ describe('#treeBuilderTest()', function() {
         listOfRootNodeNames.includes('ungrouped')
     })
 
+    it('check order of root nodes', function() {
+        var trees = data['trees']
+        for (var i=0; i<trees.length; i+=2) {
+            expect( trees[i].name ).to.equal('all')
+            expect( trees[i+1].name ).to.equal('ungrouped')
+        }
+    })
+
+
     it('check inventory1', function() {
         const rootNodeAll = data['trees'].find(n => n.name == 'all' && n.inventory == 'inventory1')
         
