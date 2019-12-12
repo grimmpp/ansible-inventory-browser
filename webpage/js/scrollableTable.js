@@ -15,13 +15,35 @@ var scrollableTable = function(id, wrapperId) {
         )).prependTo('#'+wrapperId);
 
         $(document).keydown(function(e) { 
-            if (e.key == "ArrowUp") selectPreviousRow()
-            if (e.key == "ArrowDown") selectNextRow()
+            if (e.key === "ArrowUp") {
+                selectPreviousRow()
+                if (!(isSelectedRowCloseToTop())) e.view.event.preventDefault()
+            }
+            else if (e.key === "ArrowDown") {
+                selectNextRow()
+                if (!(isSelectedRowCloseToBottom())) e.view.event.preventDefault()
+            }
+            else if (e.key === "ArrowRight") openCurrentRow()
+            else if (e.key === "ArrowLeft") closeCurrentRow()
         })
     }
 
-    this.setTableHeight = function(height) {
+    var isSelectedRowCloseToTop = function() {
+        if (lastSelectedRow != '') {
+            if (($('#'+lastSelectedRow).offset().top - $('#'+id+'_scrollableTableContainer').offset().top) < 50) return true
+        }
+        return false
+    }
 
+    var isSelectedRowCloseToBottom = function() {
+        if (lastSelectedRow != '') {
+            var height = $('#'+id+'_scrollableTableContainer').height()
+            if ((height - $('#'+lastSelectedRow).offset().top) < 50) return true
+        }
+        return false
+    }
+
+    this.setTableHeight = function(height) {
         if ($.isFunction(height)) {
             $('#'+id+'_scrollableTableContainer').height( height() )
 
@@ -79,7 +101,7 @@ var scrollableTable = function(id, wrapperId) {
         }
     }
 
-
+    
     var selectPreviousRow = function() {
         if (lastSelectedRow != "" && !($('#'+lastSelectedRow).is(':first-child'))) {
             $('#'+lastSelectedRow).prev().click()
@@ -100,6 +122,42 @@ var scrollableTable = function(id, wrapperId) {
             })
         }
         autoExpandOrCollapse = false
+    }
+
+    var openCurrentRow = function(){
+        var parentId = null
+        if (lastSelectedRow != "") {
+            autoExpandOrCollapse = true
+            var currentRow = $('#'+lastSelectedRow)
+            if (currentRow.attr('status') == 'closed') {
+                currentRow.click()
+            } else if(currentRow.attr('level') > 1) {
+                parentId = currentRow.attr('parentid')
+                if ($('#'+parentId).attr('status') == 'closed') {
+                    $('#'+parentId).click()
+                }
+            }
+            autoExpandOrCollapse = false
+            if (parentId != null) $('#'+parentId).click()
+        }
+    }
+
+    var closeCurrentRow = function(){
+        var parentId = null
+        if (lastSelectedRow != "") {
+            autoExpandOrCollapse = true
+            var currentRow = $('#'+lastSelectedRow)
+            if (currentRow.attr('status') == 'open') {
+                currentRow.click()
+            } else if(currentRow.attr('level') > 1) {
+                parentId = currentRow.attr('parentid')
+                if ($('#'+parentId).attr('status') == 'open') {
+                    $('#'+parentId).click()
+                }
+            }
+            autoExpandOrCollapse = false
+            if (parentId != null) $('#'+parentId).click()
+        }
     }
 
     this.expandTree = function() {
