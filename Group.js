@@ -3,6 +3,7 @@ const fs = require('fs')
 const loadIniFile = require('read-ini-file')
 const YAML = require('yaml')
 const ConfigFileReader = require('./ConfigFileReader.js')
+const Message = require('./Message.js')
 
 class Group {
     constructor(inventory, environment, originalName) {
@@ -188,11 +189,15 @@ class Group {
         const directoryPath = path.join(inventoryDir, 'host_vars');
         if( fs.existsSync(directoryPath)) {
             fs.readdirSync(directoryPath).forEach(function(hostname) {
-                // is host in group
-                for (var gn in groupList) {
-                    if (!(Group.isHostnameContainedInAnyGroup(hostname, groupList))) {
-                        groupList['ungrouped'].hostnames.push(hostname)
+                if (fs.lstatSync(path.join(directoryPath, hostname)).isDirectory()) {
+                    // is host in group
+                    for (var gn in groupList) {
+                        if (!(Group.isHostnameContainedInAnyGroup(hostname, groupList))) {
+                            groupList['ungrouped'].hostnames.push(hostname)
+                        }
                     }
+                } else {
+                    Message.create("warning", "folder structure", hostname, inventory, "Ignore file '"+hostname+"' in 'host_vars'!")
                 }
             })
         }

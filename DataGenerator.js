@@ -64,9 +64,11 @@ class DataGenerator {
         data["messages"].push.apply(data["messages"], Message.getAllCreatedMessages())
     
         data["trees"] = TreeBuilder.build(data["groups"], data["hosts"])
+        
         // console.dir(inventories)
         // console.dir(data["hosts"])
         // console.dir(data["groups"])
+        // console.dir(data["trees"])
         
     
         var targetFile = path.join("webpage", "generated-data", "data.js")

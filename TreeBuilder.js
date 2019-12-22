@@ -17,6 +17,7 @@ class TreeBuilder {
     }
 
     static internal_addSubgroupsToNode(flatGroupList, flatHostList, node) {
+
         node.nodes = []
         for (var i in node.subgroups) {
             var subnode = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatGroupList, node.inventory, node.subgroups[i]))
@@ -32,8 +33,9 @@ class TreeBuilder {
         }
     }
     
-    static _internal_findSubnode(flatGroupList, inventory, subnodeName) {
-        return flatGroupList.find(n => n.inventory == inventory && n.name == subnodeName)
+    static _internal_findSubnode(nodeList, inventory, subnodeName) {
+        var result = nodeList.find(n => n.inventory == inventory && n.name == subnodeName)
+        return result
     }
 
     static _internal_cloneObject(obj) {

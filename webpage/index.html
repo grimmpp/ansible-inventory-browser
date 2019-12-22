@@ -87,7 +87,7 @@
 
         $( document ).on("selectedGroup", function(event, nestedIndex) {
             // console.log(JSON.stringify(nestedIndex))
-
+            if (!(Array.isArray(nestedIndex))) nestedIndex = [nestedIndex]
             try {
                 var object = data["trees"][nestedIndex[0]]
                 for(var i=1; i<nestedIndex.length; i++) { object = object.nodes[nestedIndex[i]] }
