@@ -36,6 +36,7 @@
         var scrollableTable = new scrollableTable('scrollableTable', 'wrapper')
         scrollableTable.setTableHeight( () => { return $( window ).height() - 118 } )
 
+        /** Generic function in order to fill table and tree view */
         function updateTable(tableConfig, data) {
             scrollableTable.setTableHeader(tableConfig['header'])
             if (tableConfig['subtreeProperty'] === undefined) {
@@ -46,77 +47,62 @@
             }
         }
 
-        // console.log(data); 
-        // $('#detailView').html( JSON.stringify( data, null, 4) )
+        /** generic function which shows the json object in #detailedView */
+        function showJsonData(data, indexes) {
+            if (indexes === '') $('#detailView').html("")
+            else {
+                if (!(Array.isArray(indexes))) indexes = [indexes]
+                try {
+                    var object = data[indexes[0]]
+                    for(var i=1; i<indexes.length; i++) { object = object.nodes[indexes[i]] }
+                    var tempObject = JSON.parse(JSON.stringify(object))
+                    delete tempObject.nodes
+                    $('#detailView').html( JSON.stringify( tempObject, null, 4) )
+                } catch(e) {
+                    console.error(e)
+                    $('#detailView').html("")
+                }
+            }
+        }
 
-        $('#btJSON').click( function() {
-            scrollableTable.clearTable()
-            $('#detailView').html( JSON.stringify( data, null, 4) )
-        })
-
-
-
+        /* button hosts onClick() => fill table with hosts */
         $('#btHosts').click( function() {
             $('#detailView').text("")
             var tableConfig = data['ui-config']['host-view']
             updateTable(tableConfig, data['hosts'])
         })
 
-        $( document ).on("selectedHost", function(event, host) {
-            if (host !== "") {
-                $('#detailView').html( JSON.stringify( data["hosts"][host], null, 4) )
-            } else {
-                $('#detailView').html("")
-            }
-        });
+        /* event listener for 'selectedHost' => show JSON in host detailView */
+        $( document ).on("selectedHost", function(event, host) { showJsonData(data["hosts"], host) });
 
-
+        /* button group onClick() => fill tree table with nested groups and hosts */
         $('#btGroups').click( function() {
             $('#detailView').text("")
             var tableConfig = data['ui-config']['group-view']
             updateTable(tableConfig, data['trees'])
         })
 
-        // $( document ).on("selectedGroup", function(event, group) {
-        //     if (group !== "") {
-        //         $('#detailView').html( JSON.stringify( data["groups"][group], null, 4) )
-        //     } else {
-        //         $('#detailView').html("")
-        //     }
-        // });
+        /* event listener for 'selectedGroup' => show JSON of group in detailView */
+        $( document ).on("selectedGroup", function(event, nestedIndex) { showJsonData(data["trees"], nestedIndex) });
 
-        $( document ).on("selectedGroup", function(event, nestedIndex) {
-            // console.log(JSON.stringify(nestedIndex))
-            if (!(Array.isArray(nestedIndex))) nestedIndex = [nestedIndex]
-            try {
-                var object = data["trees"][nestedIndex[0]]
-                for(var i=1; i<nestedIndex.length; i++) { object = object.nodes[nestedIndex[i]] }
-                var tempObject = JSON.parse(JSON.stringify(object))
-                delete tempObject.nodes
-                $('#detailView').html( JSON.stringify( tempObject, null, 4) )
-            } catch(e) {
-                console.error(e)
-                $('#detailView').html("")
-            }
-        });
-
-
-
+        /* button analyse onClick() => fill table with messages which were generated during parsing of the inventories. */
         $('#btAnalyse').click( function() {
             $('#detailView').text("")
             var tableConfig = data['ui-config']['message-view']
             updateTable(tableConfig, data['messages'])
         })
 
-        $( document ).on("selectedMessage", function(event, message) {
-            if (message !== "") {
-                $('#detailView').html( JSON.stringify( data["messages"][message]["details"], null, 4) )
-            } else {
-                $('#detailView').html("")
-            }
-        });
+        /* event listener for 'selectedMessage' => show JSON of message in detailView */
+        $( document ).on("selectedMessage", function(event, message) { showJsonData(data["messages"], message) });
 
-        // Show host view
+        /* button JSON onClick() => show whole JSON data about everything which was parsed through all inventories */
+        $('#btJSON').click( function() {
+            scrollableTable.clearTable()
+            $('#detailView').html( JSON.stringify( data, null, 4) )
+        })
+
+
+        // Initially load host view
         $('#btHosts').trigger( "click" );
 
     </script>
