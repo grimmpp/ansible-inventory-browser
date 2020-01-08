@@ -1,4 +1,7 @@
-test
-webpage
+.git
 .gitignore
+.dockerignore
+npm-debug.log
+test
 node_modules/
+webpage/generated-data

@@ -29,6 +29,7 @@ if(argv['verbose']) Message.enableLogging()
 var inventoryConfigFilename = path.join(".", "inventory.conf")
 if (argv["configFile"]) inventoryConfigFilename = argv["configFile"]
 
+console.log("Use config file: %s", inventoryConfigFilename)
 
 DataGenerator.parseInventoriesAndGenerateData(inventoryConfigFilename)
 
