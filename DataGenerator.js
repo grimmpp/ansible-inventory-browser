@@ -70,8 +70,9 @@ class DataGenerator {
         // console.dir(data["groups"])
         // console.dir(data["trees"])
         
-    
-        var targetFile = path.join("webpage", "generated-data", "data.js")
+        var targetDir = path.join("webpage", "generated-data")
+        if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir)
+        var targetFile = path.join(targetDir, "data.js")
         fs.writeFileSync(targetFile, "var data = " + JSON.stringify(data))
     
         console.log(colorG+"Completed file generation: %s"+colorRst, targetFile)
