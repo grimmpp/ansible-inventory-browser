@@ -7,7 +7,7 @@ There are some [example inventories](/example-inventories) within this project a
 
 In order to check out the [example inventories](/example-inventories) nothing except a browser is needed. The webpage consists of pure html and javascript and the data for the example inventories is pregenerated within the webpage folder.
 
-This is how to will look like: <br/>
+This is how it will look like: <br/>
 <img src="screenshot-webui.jpg" width=800/>
 
 ## How it works
