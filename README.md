@@ -1,4 +1,26 @@
-# Ansible Inventory Browser => In Progress!!!
+# Ansible Inventory Browser
+This project can parse ansible inventories and display them graphically on a webpage.
+
+## Features
+* Parses Inventories
+  * Some error, warning and messages about the inventory structur and concent will be displayed.
+  * Generates one consistent data structure for the WebUI.
+* WebUI
+  * What can be seen on the WebUI:
+    * **Host list**
+    * **Groups and hosts treeview**
+    * List of **parser information**
+    * Whole **structured WebUI data** as json
+    * **Detail view** which shows all information about selected hosts or groups
+      * In the treeview (Group View) also inherited information (e.g. variables will be displayed on every level)
+  * **Custom Columns** in Host and Group View can be configured.
+    * All attributes in the whole structure can be configured. (As example in the host view you can add a column about the iLO IP Address which is available but distributed in files called network under the folder host_vars.)
+      
+### Planned features
+* JSON highliting
+* Ability to add custom functions which can convert or enricht information to be displayed.
+* WebUI for generating settings file
+
 
 ## Browse through the example inventories
 There are some [example inventories](/example-inventories) within this project and their data for the webUI is pregenerated. If you want to check out how this tool works just:
