@@ -20,7 +20,7 @@ This project can parse ansible inventories and display them graphically on a web
 * JSON highliting
 * Ability to add custom functions which can convert or enricht information to be displayed.
 * Autodetection if inventories change so that the structed data for the WebUI will be parsed again. (This shall be built-in the webserver part)
-* Configuration of custom columns shall be dynamic and also possible after parsing the inventories.
+* Configuration of custom columns shall be dynamic and also possible after parsing the inventories so that a use can change them while browsing.
 * WebUI for generating settings file
 
 
