@@ -12,9 +12,8 @@
   <link rel="stylesheet" type="text/css" media="all" href="css/scrollableTable.css">
   
   <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-  <!-- https://github.com/Mottie/tablesorter/wiki -->
-  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
-  <!-- https://mottie.github.io/tablesorter/docs/#Demo -->
+  
+  <!-- https://github.com/grimmpp/sortable-and-scrollable-table-with-fixed-header -->
   <script type="text/javascript" src="js/scrollableTable.js"></script>
 
   <script type="text/javascript" src="generated-data/data.js"></script>
@@ -39,12 +38,8 @@
         /** Generic function in order to fill table and tree view */
         function updateTable(tableConfig, data) {
             scrollableTable.setTableHeader(tableConfig['header'])
-            if (tableConfig['subtreeProperty'] === undefined) {
-                scrollableTable.setTableContent(data, tableConfig['event-type'], tableConfig['columns'])
-            } else {
-                scrollableTable.setTreeTableContent(data, tableConfig['event-type'], tableConfig['columns'], tableConfig['subtreeProperty'])
-                scrollableTable.expandTree()
-            }
+            scrollableTable.setTableContent(data, tableConfig['event-type'], tableConfig['columns'], tableConfig['subtreeProperty'])
+            scrollableTable.expandTree()
         }
 
         /** generic function which shows the json object in #detailedView */

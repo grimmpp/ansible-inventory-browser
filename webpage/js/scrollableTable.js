@@ -178,7 +178,9 @@ var scrollableTable = function(id, wrapperId) {
         $.each(names, function(index, value) {
             // Set header
             trElem.append( 
-                $('<th>').append($('<div>').text(value))
+                $('<th>')
+                    .append($('<div>').text(value))
+                    .click(() => {root.sortByColumnIndex(index)})
             )
         });
         trElem.appendTo("#scrollableTableHeader")
@@ -191,73 +193,59 @@ var scrollableTable = function(id, wrapperId) {
             $(this).append( $('<span>').text(divElem.text()) )
             divElem.width( 0 )
         })
+
         // Adjust size
         $('#'+id+' > thead > tr').children('th').each(function () {
-            $(this).children().first().width( $(this).width() )
+            var div = $(this).children().first()
+            div.width( $(this).width() )
+            div.css('background-position-x', $(this).width()-15)
             $(this).width( $(this).width() )
         })
         // remove text from th
         $('#'+id+' > thead > tr > th').children('span').remove()
 
-        refreshHeaderBackground()
+        $('#scrollableTableHeader > tr > th > div').addClass('scrollableTableHeaderBackground')
     }
 
-    var refreshHeaderBackground = function() {
-        if (isTreeTable) {
-            $('#scrollableTableHeader > tr > th > div').removeClass('scrollableTableHeaderBackground')
-        } else {
-            $('#scrollableTableHeader > tr > th > div').addClass('scrollableTableHeaderBackground')
-        }
-    }
-
-    this.setTreeTableContent = function(data, eventType, columns, subtreePropertyName) {
-        isTreeTable = true
+    this.setTableContent = function(data, eventType, columns, subtreePropertyName="") {
+        if (subtreePropertyName === undefined) subtreePropertyName = ""
+        isTreeTable = subtreePropertyName != ""
         fillTable(data, eventType, columns, subtreePropertyName)
 
         root.adjustHeaderSize()
     }
 
-    this.setTableContent = function(data, eventType, columns) {
-        isTreeTable = false
-        fillTable(data, eventType, columns)
-
-        root.adjustHeaderSize()
-
-        $('#scrollableTable').tablesorter(); 
-    }
-
     var fillTable = function(data, eventType, columns, subtreePropertyName="") {
         $('#'+id+' > tbody').empty()
         lastSelectedRow = ""
+        
+        var insertAfterElem = null
+        var parentId = "scrollableTable_rowId_root"
+        var level = 1
 
         // Fill content
         $.each(data, function(index) {
-            createRow(data, index, eventType, columns, subtreePropertyName)
+            createChildRow(data, index, eventType, columns, subtreePropertyName, insertAfterElem, parentId, level, [index]);
         })
     }
 
-    var createRow = function(data, index, eventType, columns, subtreePropertyName) {
-        var indexes = [index]
-        createChildRow(data, index, eventType, columns, subtreePropertyName, null,"",1, indexes);
-    }
-
     var createChildRow = function(data, index, eventType, columns, subtreePropertyName, insertAfterElem, parentId, level, parentIndexes) {
+        // build row id
         const rowId = id+'_rowId_'+ (++lastRowId)
 
+        // create html row
         var trElem = $('<tr>').attr('id', rowId).attr('level', level).attr('parentId', parentId)
-
-        // var nestedIndex = "";
-        // if ( (""+parentIndex).length > 0) nestedIndex = parentIndex +","+index
-        // else nestedIndex = index
 
         if (isTreeTable) trElem.click(() => { root.selectTreeTableRow(rowId, eventType, parentIndexes) })
         else trElem.click(() => { root.selectRow(rowId, eventType, index) })
 
+        // calc distance for collapse and expand icon
         const distText = level*16
         const distIcon=(level-1)*16
 
+        // fill up cells
         $.each(columns, function(c_index, c_value) {
-            trElem.append($('<td>').attr('parentId', parentId).text(data[index][c_value]))
+            trElem.append($('<td>').text(data[index][c_value]))
         })
 
         // isTreeTable
@@ -294,6 +282,12 @@ var scrollableTable = function(id, wrapperId) {
                             fristTdElem.addClass("scrollableTableExpanded")
                             fristTdElem.removeClass("scrollableTableCollapsed")
 
+                            //if table is sorted sort newly expanded subtree
+                            var sortInfo = root.getSortInfo()
+                            if (sortInfo.isSorted) {
+                                sortSubtreeByColumn(rowId, sortInfo.columnIndex, sortInfo.sortDir)
+                            }
+
                         } else {
                             closeSubRows(rowId)
                             fristTdElem.removeClass("scrollableTableExpanded")
@@ -316,12 +310,14 @@ var scrollableTable = function(id, wrapperId) {
     var closeSubRows = function(parentRowId) {
         $('#'+parentRowId).attr('status', 'closed')
         
-        $( "td[parentId='"+parentRowId+"']" ).each(function(index, elem) {
-            var parentTr = $( document ).find( elem ).parent()
+        $( "tr[parentId='"+parentRowId+"']" ).each(function(index, elem) {
+            var parentTr = $( document ).find( elem )
+            // if (parentTr.attr('status') == 'open') closeSubRows(parentTr.attr('id'))
             if (parentTr.attr('status') == 'open') closeSubRows(parentTr.attr('id'))
+            parentTr.remove()
         })
 
-        $( "td[parentId='"+parentRowId+"']" ).parent().remove()
+        // $( "tr[parentId='"+parentRowId+"']" ).remove()
     }
 
     this.clearTable = function() {
@@ -329,6 +325,241 @@ var scrollableTable = function(id, wrapperId) {
         $('#scrollableTable > thead').empty()
         $('#scrollableTable > tbody').empty()
     }
+
+    var getRowId = function(row){
+        return row.attr('id')
+    }
+
+    var getCellValueFromTable = function(row, column) {
+        return row.children().eq(column).text()
+    }
+
+    /**
+     *      SORT FUNCTIONS
+     */
+
+    this.sortByColumnName = function(columnName) {
+        var columnButton = $('#scrollableTable > thead > tr > th:contains("'+columnName+'")')
+        var index = columnButton.parent().children().index(columnButton)
+        root.sortByColumnIndex(index)
+    }
+
+    this.sortByColumnIndex = function(columnIndex) {
+        var columnButton = $('#'+id+' > thead > tr > th').eq(columnIndex)
+        
+        var parentId = $('tr[level=1]', $('#scrollableTable > tbody')).first().attr('parentId')
+
+        // swop sort directions
+        var sortDir = columnButton.attr('sortDir')
+        $('#scrollableTable > thead > tr > th').removeAttr('sortDir');
+        if (sortDir === undefined) sortDir = 1
+        else sortDir = sortDir * -1
+        columnButton.attr('sortDir', sortDir)
+        
+        // reset and set sort icons
+        $('#scrollableTable > thead > tr > th > div').css('background-image', "url('css/unsorted-icon.png')")
+        if (sortDir == -1) columnButton.children('div').css('background-image', "url('css/dasc-icon.png')")
+        else columnButton.children('div').css('background-image', "url('css/asc-icon.png')")
+
+        console.log("sort by column (Name: %s, Index: %d, direction: %d)", columnButton.text(), columnIndex, sortDir)
+        sortSubtreeByColumn(parentId, columnIndex, sortDir)
+
+        // remove all flags
+        $('#scrollableTable > tbody > tr').removeAttr('subtreeSorted');
+        // console.log("sorting finished")
+    }
+
+    this.getSortInfo = function() {
+        var columnButton = $('#scrollableTable > thead > tr > th[sortDir]')
+        var index = columnButton.parent().children().index(columnButton)
+
+        return {
+            isSorted: index > -1, 
+            buttonObject: columnButton,
+            buttonText: columnButton.text(),
+            columnIndex: index,
+            sortDir: columnButton.attr('sortDir')
+        }
+    }
+
+    var defaultCompareFunction = function(a,b) {
+        return a.localeCompare(b, undefined, {usage: 'sort', numeric: true, sensitivity: 'base'})
+    }
+
+    var compareFunction = defaultCompareFunction
+
+    this.setCompareFunctionForSorting = function(f) {
+        compareFunction = f
+    }
+
+    var sortSubtreeByColumn = function(parentId, columnIndex, sortDir) {
+        // bubbleSort(Array A)
+        //     for (n=A.size; n>1; --n){
+        //         for (i=0; i<n-1; ++i){
+        //         if (A[i] > A[i+1]){
+        //             A.swap(i, i+1)
+        //         } // End if
+        //         } // End inner for-loop
+        //     } // End second for-loop
+        
+        // console.log("sortSubtreeByColumn - parentId: %s, columnIndex: %d, sortDir: %d", parentId, columnIndex, sortDir)
+        
+        var size = $('tr[parentId='+parentId+']', $('#scrollableTable > tbody')).length
+        for(var n=size; n>1; n--) {
+            
+            var row1 = $('tr[parentId='+parentId+']', $('#scrollableTable > tbody')).first()
+            handleSubtree(row1, columnIndex, sortDir)
+
+            // sort list which have entered given parentId
+            do {
+                var value1 = getCellValueFromTable(row1, columnIndex)
+                var row2 = findNextTableRowOnSameLevel(row1)
+                // if there is no second element in the same subtree
+                if (row2 === undefined) break;
+                var value2 = getCellValueFromTable(row2, columnIndex)
+
+                handleSubtree(row2, columnIndex, sortDir)
+
+                // console.log("row1 id: "+getRowId(row1)+", value1: "+value1)   
+                // console.log("row2 id: "+getRowId(row2)+", value1: "+value2)   
+                // console.log("")
+
+                // console.log("compare: "+firstValue.localeCompare(secondValue))
+
+                if (compareFunction(value1, value2) == sortDir) {
+                    // move first element after second
+                    moveRowAfter(row1, row2)
+                }
+                else {
+                    row1 = row2
+                }
+                
+            } while(getRowId(row1) != undefined && getRowId(row2) != undefined )
+            // console.log("############################################")
+        }
+    }
+
+    var handleSubtree = function(row, columnIndex, sortDir) {
+        if (hasRowSubtree(row) && subtreeIsNotSorted(row)) {
+            row.attr('subtreeSorted', 'true')
+            // console.log("subtree "+getValueFromTable(row,columnIndex))
+            sortSubtreeByColumn(row.attr('id'), columnIndex, sortDir)
+        }
+    }
+
+    var hasRowSubtree = function(row) {
+        return row.next().attr('level') > row.attr('level')
+    }
+
+    var subtreeIsNotSorted = function(row) {
+        return !(row.attr('subtreeSorted') == 'true')
+    }
+
+    var moveRowAfter = function(row1, row2) {
+        // console.log("\nmoveRowAfter - start")
+
+        var lastChildRow2 = findLastChildRow(row2)
+        // console.log("move - down - row1: "+getValueFromTable(row1,0))
+        // console.log("move down - row2: "+getValueFromTable(row2,0))
+        // console.log("move down - last child row2: "+getValueFromTable(lastChildRow2,0))
+        
+        // start with last subtree element of row1
+        do {
+            var currentRow = row2.prev()
+            currentRow.insertAfter(lastChildRow2)
+
+            // console.log("move down - move " + getValueFromTable(currentRow,0) + " after " + getValueFromTable(lastChildRow2,0))
+            // console.log("move down - current row Id: " + getRowId(currentRow) +", row1 Id: "+getRowId(row1))
+        } while(getRowId(currentRow) != getRowId(row1))
+    }
+
+    var findLastChildRow = function(row) {
+        var lastChild = row
+
+        // console.log("findLastChildRow - row "+getValueFromTable(row,0) +", level: "+row.attr('level'))
+        // console.log("findLastChildRow - next: "+ getValueFromTable(lastChild.next(), 0))
+
+        while (row.attr('level') < lastChild.next().attr('level')) {
+            // console.log("findLastChildRow - child "+getValueFromTable(lastChild,0) +", level: "+lastChild.attr('level'))
+            lastChild = lastChild.next()
+        }
+        // console.log("findLastChildRow - last child "+getValueFromTable(lastChild,0) +", level: "+lastChild.attr('level'))
+        
+        return lastChild
+    }
+
+    var findNextTableRowOnSameLevel = function(row) {
+        var level = row.attr('level')
+        var parentId = row.attr('parentid')
+        var nextElem = row
+        var nextLevel = 0
+
+        do {
+            nextElem = nextElem.next()
+            nextLevel = nextElem.attr('level')
+            nextParentId = nextElem.attr('parentid')
+        } while (level < nextLevel && parentId != nextParentId)
+
+        // if first element does not match
+        if (parentId != nextElem.attr('parentid')) return undefined
+
+        return nextElem
+    }
+
+    /**
+     *      END SORT FUNCTIONS
+     */
+
+    
+    /**
+     *      FILTER FUNCTIONS
+     */
+
+
+    this.clearFilter = function() {
+        filter("")
+    }
+
+
+    var containsRowSearchString = function(row, searchString) {
+        var result = false
+
+        row.children('td').each((index, _td) => {
+            var tdElem = $(_td)
+            if (tdElem.text().toLowerCase().indexOf(searchString) > -1) {
+                result = true
+                return
+            }
+        })
+
+        return result
+    }
+
+    var makeParentsVisible = function(parentId) {
+        if (parentId.indexOf('root') == -1) {
+            $('#'+parentId).css('display', '')
+            makeParentsVisible($('#'+parentId).attr('parentId'))
+        }
+    }
+
+    this.filter = function(searchString) {
+        var rows = $('#scrollableTable > tbody > tr')
+
+        rows.each((index, _row) => {
+            var row = $(_row)
+            if (!containsRowSearchString(row, searchString.toLowerCase())) {
+                row.css('display', 'none')
+            } else {
+                row.css('display', '')
+                makeParentsVisible($(row).attr('parentId'))
+            }
+        })
+    }
+
+    /**
+     *      END FILTER FUNCTIONS
+     */
+    
 
     create()
 }
