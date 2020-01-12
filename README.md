@@ -10,6 +10,7 @@ This project can parse ansible inventories and display them graphically on a web
     * **Host list**
       * Columns can be sorted.
     * **Groups and hosts treeview**
+      * Columns and subtrees can be sorted.
     * List of **parser information**
     * Whole **structured WebUI data** as json
     * **Detail view** which shows all information about selected hosts or groups
@@ -20,8 +21,7 @@ This project can parse ansible inventories and display them graphically on a web
 ### Planned features
 * JSON highliting
 * Make inherited values visible.
-* Search function for table contnet.
-* Sort function for treeview (Group List)
+* Filter function for table contnet.
 * Splitter btw tables and detail view.
 * Ability to add custom functions which can convert or enricht information to be displayed.
 * Autodetection if inventories change so that the structed data for the WebUI will be parsed again. (This shall be built-in the webserver part)
