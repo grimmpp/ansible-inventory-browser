@@ -13,7 +13,7 @@ This project can parse ansible inventories and display them graphically on a web
     * Whole **structured WebUI data** as json
     * **Detail view** which shows all information about selected hosts or groups
       * In the treeview (Group View) also inherited information (e.g. variables will be displayed on every level)
-  * **Sort and filter function** for Host and Group tables
+  * **Sort and filter function** for all tables
   * **Custom Columns** in Host and Group View can be configured.
     * All attributes in the whole structure can be configured. (As example in the host view you can add a column about the iLO IP Address which is available but distributed in files called network under the folder host_vars.)
       
