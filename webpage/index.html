@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html">
-  <title>Simple Table Sorting with jQuery - Treehouse Demo</title>
+  <title>Ansible Inventory Browser</title>
   <meta name="author" content="Jake Rocheleau">
   <link rel="shortcut icon" href="http://d15dxvojnvxp1x.cloudfront.net/assets/favicon.ico">
   <link rel="icon" href="http://d15dxvojnvxp1x.cloudfront.net/assets/favicon.ico">
@@ -27,6 +27,10 @@
             <button id="btGroups">Groups</button>
             <button id="btAnalyse">Result of Analysis</button>
             <button id="btJSON">Show all Data as JSON</button>
+            <input id="filterTextField" type="text" value="" 
+                style="color: grey; padding-left: 8px; height: 26px; "
+                onkeydown="onKeyDownFilterTable()" onkeyup="onKeyUpFilterTable()" 
+                onfocus="onfocusFilterTable()" onblur="onblurFilterTable()"></span>
         </div>
         <pre id="detailView" ></pre>
     </div>
@@ -96,6 +100,66 @@
             $('#detailView').html( JSON.stringify( data, null, 4) )
         })
 
+        
+        /**
+         * filter functions 
+         */
+
+        var filterInfoText = "type to filter table"
+        $('#filterTextField').val(filterInfoText)
+        function onKeyDownFilterTable() { 
+            console.log("keyDown")
+            var value = $('#filterTextField').val()
+
+            if (value == filterInfoText) onfocusFilterTable()
+            else scrollableTable.filter($('#filterTextField').val()) 
+        }
+        function onKeyUpFilterTable() { 
+            console.log("keyUp")
+            var value = $('#filterTextField').val()
+
+            if (value == '') onblurFilterTable()
+            else if (value == filterInfoText) {
+                setCaretToPos( document.getElementById('filterTextField'), 0);
+                scrollableTable.filter('')
+            }
+            else scrollableTable.filter($('#filterTextField').val()) 
+        }
+        function onfocusFilterTable() {
+            console.log("focus")
+            if ($('#filterTextField').val() == filterInfoText) {
+                $('#filterTextField').val('')
+                $('#filterTextField').css('color', 'black') 
+            }
+        }
+        function onblurFilterTable() { 
+            console.log("blur")
+            if ($('#filterTextField').val() == '') { 
+                $('#filterTextField').css('color', 'grey') 
+                $('#filterTextField').val(filterInfoText)
+            }
+        }
+
+        function setSelectionRange(input, selectionStart, selectionEnd) {
+            if (input.setSelectionRange) {
+                input.focus();
+                input.setSelectionRange(selectionStart, selectionEnd);
+            }
+            else if (input.createTextRange) {
+                var range = input.createTextRange();
+                range.collapse(true);
+                range.moveEnd('character', selectionEnd);
+                range.moveStart('character', selectionStart);
+                range.select();
+            }
+        }
+        function setCaretToPos(input, pos) {
+            setSelectionRange(input, pos, pos);
+        }
+
+        /**
+         * end filter functions 
+         */
 
         // Initially load host view
         $('#btHosts').trigger( "click" );
