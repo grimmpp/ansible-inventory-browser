@@ -66,6 +66,7 @@
 
         /* button hosts onClick() => fill table with hosts */
         $('#btHosts').click( function() {
+            resetFilterTextField()
             $('#detailView').text("")
             var tableConfig = data['ui-config']['host-view']
             updateTable(tableConfig, data['hosts'])
@@ -76,6 +77,7 @@
 
         /* button group onClick() => fill tree table with nested groups and hosts */
         $('#btGroups').click( function() {
+            resetFilterTextField()
             $('#detailView').text("")
             var tableConfig = data['ui-config']['group-view']
             updateTable(tableConfig, data['trees'])
@@ -86,6 +88,7 @@
 
         /* button analyse onClick() => fill table with messages which were generated during parsing of the inventories. */
         $('#btAnalyse').click( function() {
+            resetFilterTextField()
             $('#detailView').text("")
             var tableConfig = data['ui-config']['message-view']
             updateTable(tableConfig, data['messages'])
@@ -96,26 +99,29 @@
 
         /* button JSON onClick() => show whole JSON data about everything which was parsed through all inventories */
         $('#btJSON').click( function() {
+            resetFilterTextField()
             scrollableTable.clearTable()
             $('#detailView').html( JSON.stringify( data, null, 4) )
         })
 
-        
+
         /**
          * filter functions 
          */
 
         var filterInfoText = "type to filter table"
-        $('#filterTextField').val(filterInfoText)
+        resetFilterTextField()
+        function resetFilterTextField() {
+            $('#filterTextField').val('')
+            onblurFilterTable()
+        }
         function onKeyDownFilterTable() { 
-            console.log("keyDown")
             var value = $('#filterTextField').val()
 
             if (value == filterInfoText) onfocusFilterTable()
             else scrollableTable.filter($('#filterTextField').val()) 
         }
         function onKeyUpFilterTable() { 
-            console.log("keyUp")
             var value = $('#filterTextField').val()
 
             if (value == '') onblurFilterTable()
@@ -126,17 +132,18 @@
             else scrollableTable.filter($('#filterTextField').val()) 
         }
         function onfocusFilterTable() {
-            console.log("focus")
             if ($('#filterTextField').val() == filterInfoText) {
                 $('#filterTextField').val('')
                 $('#filterTextField').css('color', 'black') 
             }
         }
         function onblurFilterTable() { 
-            console.log("blur")
             if ($('#filterTextField').val() == '') { 
                 $('#filterTextField').css('color', 'grey') 
                 $('#filterTextField').val(filterInfoText)
+            }
+            if ($('#filterTextField').val() == filterInfoText) {
+                scrollableTable.filter('')
             }
         }
 
