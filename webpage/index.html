@@ -36,7 +36,8 @@
     </div>
 
     <script type="text/javascript">
-        var scrollableTable = new scrollableTable('scrollableTable', 'wrapper')
+        var loggingEnabled = false
+        var scrollableTable = new scrollableTable('scrollableTable', 'wrapper', loggingEnabled)
         scrollableTable.setTableHeight( () => { return $( window ).height() - 118 } )
 
         /** Generic function in order to fill table and tree view */
@@ -47,20 +48,14 @@
         }
 
         /** generic function which shows the json object in #detailedView */
-        function showJsonData(data, indexes) {
-            if (indexes === '') $('#detailView').html("")
+        function showJsonData(event, eventData) {
+            if (eventData != null) {
+                var tempObject = JSON.parse(JSON.stringify(eventData))
+                delete tempObject.nodes
+                $('#detailView').html( JSON.stringify( tempObject, null, 4) )
+            }
             else {
-                if (!(Array.isArray(indexes))) indexes = [indexes]
-                try {
-                    var object = data[indexes[0]]
-                    for(var i=1; i<indexes.length; i++) { object = object.nodes[indexes[i]] }
-                    var tempObject = JSON.parse(JSON.stringify(object))
-                    delete tempObject.nodes
-                    $('#detailView').html( JSON.stringify( tempObject, null, 4) )
-                } catch(e) {
-                    console.error(e)
-                    $('#detailView').html("")
-                }
+                $('#detailView').html("")
             }
         }
 
@@ -73,7 +68,7 @@
         })
 
         /* event listener for 'selectedHost' => show JSON in host detailView */
-        $( document ).on("selectedHost", function(event, host) { showJsonData(data["hosts"], host) });
+        $( document ).on("selectedHost", showJsonData );
 
         /* button group onClick() => fill tree table with nested groups and hosts */
         $('#btGroups').click( function() {
@@ -84,7 +79,7 @@
         })
 
         /* event listener for 'selectedGroup' => show JSON of group in detailView */
-        $( document ).on("selectedGroup", function(event, nestedIndex) { showJsonData(data["trees"], nestedIndex) });
+        $( document ).on("selectedGroup", showJsonData );
 
         /* button analyse onClick() => fill table with messages which were generated during parsing of the inventories. */
         $('#btAnalyse').click( function() {
@@ -95,12 +90,12 @@
         })
 
         /* event listener for 'selectedMessage' => show JSON of message in detailView */
-        $( document ).on("selectedMessage", function(event, message) { showJsonData(data["messages"], message) });
+        $( document ).on("selectedMessage", showJsonData );
 
         /* button JSON onClick() => show whole JSON data about everything which was parsed through all inventories */
         $('#btJSON').click( function() {
             resetFilterTextField()
-            scrollableTable.clearTable()
+            scrollableTable.clearTableContent()
             $('#detailView').html( JSON.stringify( data, null, 4) )
         })
 
@@ -129,7 +124,9 @@
                 setCaretToPos( document.getElementById('filterTextField'), 0);
                 scrollableTable.filter('')
             }
-            else scrollableTable.filter($('#filterTextField').val()) 
+            else {
+                scrollableTable.filter($('#filterTextField').val()) 
+            }
         }
         function onfocusFilterTable() {
             if ($('#filterTextField').val() == filterInfoText) {
