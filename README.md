@@ -18,6 +18,7 @@ This project can parse ansible inventories and display them graphically on a web
     * All attributes in the whole structure can be configured. (As example in the host view you can add a column about the iLO IP Address which is available but distributed in files called network under the folder host_vars.)
       
 ### Planned features
+* Generation of graphs (Started doing it: [graphView.png](graphView.png))
 * JSON highliting
 * Make inherited values visible.
 * Splitter btw tables and detail view.
