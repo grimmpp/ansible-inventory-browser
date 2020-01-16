@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html">
+  <title>Ansible Inventory Browser</title>
+  <meta name="author" content="Philipp Grimm">
+  <link rel="shortcut icon" href="http://d15dxvojnvxp1x.cloudfront.net/assets/favicon.ico">
+  <link rel="icon" href="http://d15dxvojnvxp1x.cloudfront.net/assets/favicon.ico">
+
+  <link rel="stylesheet" type="text/css" media="all" href="css/styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/scrollableTable.css">
+  
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  
+  <!-- https://github.com/grimmpp/sortable-and-scrollable-table-with-fixed-header -->
+  <script type="text/javascript" src="js/scrollableTable.js"></script>
+
+  <!-- pre-generated data which originally comes from the inventories -->
+  <script type="text/javascript" src="generated-data/data.js"></script>
+
+  <!-- https://github.com/mdaines/viz.js -->
+  <!-- https://github.com/mdaines/viz.js/wiki/Usage -->
+  <script type="text/javascript" src="js/viz.js"></script>
+  <script type="text/javascript" src="js/full.render.js"></script>
+</head>
+
+<body>
+    <table id="graphs"><tr></tr></table>
+    <script>
+        var viz = new Viz();
+        var graphs = []
+
+        // var graphData = ''// 'digraph envs { rankdir=TB; splines=False; '
+        function drawGroups(env, group, colorValue) {
+            var graphData = ''
+            if (group.type == 'group' && group.environment_label == env) {
+                var cv = colorValue+''+colorValue
+                var groupName = group.name.replace(/ /g, '_').replace(/-/g, '_')
+                graphData += 'subgraph cluster_'+groupName+' { fillcolor="#'+cv+'ff'+cv+'"; style=filled; label = "'+group.name+'"; '
+
+                // enter hosts
+                group.hostnames.forEach(host => {
+                    graphData += '"'+host +'" [style=filled; shape=rect; fillcolor=lightblue]; '
+                })
+
+                // enter invisible edges
+                var lastHost = null
+                group.hostnames.forEach(host => {
+                    if (lastHost != null) {
+                        //TODO: not working
+                        // graphData += ' "'+lastHost+'" -> "'+host+'" [style=invis]; '
+                        // console.log(' "'+lastHost+'" -> "'+host+'" [style=invis]; ')
+                    }
+                    lastHost = host
+                })
+
+                group.nodes.forEach(subgroup => {
+                    graphData += drawGroups(env, subgroup, colorValue+6)
+                })
+
+                graphData += ' } '   // close group
+            }
+
+            return graphData
+        }
+
+        data['inventory-config'].forEach(inventory => {
+
+            // graphData += 'subgraph cluster_'+inventory.env+' { style=dashed; label = "'+inventory.env+'"; '
+            var env = inventory.env.replace(/ /g, '_')
+            var graphData = 'graph '+env+' { rankdir=LR; splines=False; style=dashed; '
+            graphData += 'subgraph cluster_'+env+' { style=dashed; label = "'+inventory.env+'"; '
+
+            data['trees'].forEach(group => {
+
+                graphData += drawGroups(inventory.env, group, 0)
+
+                // if (group.type == 'group' && group.environment_label == inventory.env) {
+
+                //     graphData += 'subgraph cluster_'+group.name+' { fillcolor="#66ff66"; style=filled; label = "'+group.name+'"; '
+                
+                //     // enter hosts
+                //     group.hostnames.forEach(host => {
+                //         graphData += '"'+host +'" [style=filled; shape=rect; fillcolor=lightblue]; '
+                //     })
+
+                    
+
+                //     graphData += '} '   // close group
+                // }
+            })   //end group
+
+            graphData += ' } } '   // close inventory 
+
+            graphs.push(graphData)
+        });
+        // graphData += '} '   // close graph
+
+        // graphData = 'digraph D { subgraph cluster_c2 {    label = "Child two";    e;  }}'
+        // graphData = 'digraph envs { subgraph cluster_env1 { label = "env1"; node_env1; }}'
+
+        var tr = document.createElement('tr');
+        document.getElementById('graphs').appendChild(tr)
+
+        graphs.forEach(graphData => {
+
+            console.log(graphData)
+            viz.renderSVGElement(graphData, {engine: 'dot',format: 'svg'})
+            .then(function(element) {
+                var td = document.createElement('td');
+                td.setAttribute('valign', 'top')
+                td.appendChild(element);
+                tr.appendChild(td)
+            })
+            .catch(error => {
+                // Create a new Viz instance (@see Caveats page for more info)
+                viz = new Viz();
+
+                // Possibly display the error
+                console.error(error);
+            });
+        })
+    </script>
+
+</body>
+</html>
