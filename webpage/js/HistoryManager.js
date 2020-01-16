@@ -79,6 +79,7 @@ class HistoryManager {
             else url.searchParams.delete(eKey)
         })
 
-        window.history.pushState({}, '', url.toString())
+        // window.history.pushState({}, '', url.toString())
+        window.history.replaceState({}, '', url.toString())
     }
 }
