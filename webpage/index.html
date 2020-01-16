@@ -16,6 +16,8 @@
 
   <!-- pre-generated data which originally comes from the inventories -->
   <script type="text/javascript" src="generated-data/data.js"></script>
+
+  <script type="text/javascript" src="js/HistoryManager.js"></script>
 </head>
 
 <body>
@@ -27,18 +29,32 @@
             <button id="btAnalyse">Result of Analysis</button>
             <button id="btJSON">Show all Data as JSON</button>
             <input id="filterTextField" type="text" value="" 
-                style="color: grey; padding-left: 8px; height: 26px; "
-                onkeydown="onKeyDownFilterTable()" onkeyup="onKeyUpFilterTable()" 
-                onfocus="onfocusFilterTable()" onblur="onblurFilterTable()"></span>
+                style="color: grey; padding-left: 8px; height: 26px; " onkeyup="filter()" 
+                placeholder="type to filter table"
+            ></span>
             <a href="graphView.html" target="_blank">Graph View</a>
         </div>
         <pre id="detailView" ></pre>
     </div>
 
     <script type="text/javascript">
+        
+        var historyMgr = new HistoryManager()
+
         var loggingEnabled = false
         var scrollableTable = new scrollableTable('scrollableTable', 'wrapper', loggingEnabled)
         scrollableTable.setTableHeight( () => { return $( window ).height() - 118 } )
+
+        function filter() {
+            var value = $('#filterTextField').val()
+            scrollableTable.filter( value )
+            historyMgr.setParameters({filter: value})
+        }
+
+        function resetFilterTextField() {
+            $('#filterTextField').val('')
+            historyMgr.setParameters({filter: ''})
+        }
 
         /** Generic function in order to fill table and tree view */
         function updateTable(tableConfig, data) {
@@ -51,17 +67,20 @@
         function showJsonData(event, eventData) {
             if (eventData != null) {
                 var tempObject = JSON.parse(JSON.stringify(eventData))
-                delete tempObject.nodes
+                delete tempObject.data.nodes
                 $('#detailView').html( JSON.stringify( tempObject, null, 4) )
+                historyMgr.setParameters({selectedObject: eventData.data.inventory+';'+eventData.data.type+';'+eventData.data.name })
             }
             else {
                 $('#detailView').html("")
+                historyMgr.setParameters({selectedObject: ''})
             }
         }
 
         /* button hosts onClick() => fill table with hosts */
         $('#btHosts').click( function() {
-            resetFilterTextField()
+            if (historyMgr.getParameter('view') != 'Hosts') resetFilterTextField()
+            historyMgr.setParameters({view: 'Hosts'})
             $('#detailView').text("")
             var tableConfig = data['ui-config']['host-view']
             updateTable(tableConfig, data['hosts'])
@@ -72,7 +91,8 @@
 
         /* button group onClick() => fill tree table with nested groups and hosts */
         $('#btGroups').click( function() {
-            resetFilterTextField()
+            if (historyMgr.getParameter('view') != 'Groups') resetFilterTextField()
+            historyMgr.setParameters({view: 'Groups'})
             $('#detailView').text("")
             var tableConfig = data['ui-config']['group-view']
             updateTable(tableConfig, data['trees'])
@@ -83,7 +103,8 @@
 
         /* button analyse onClick() => fill table with messages which were generated during parsing of the inventories. */
         $('#btAnalyse').click( function() {
-            resetFilterTextField()
+            if (historyMgr.getParameter('view') != 'Analyse') resetFilterTextField()
+            historyMgr.setParameters({view: 'Analyse'})
             $('#detailView').text("")
             var tableConfig = data['ui-config']['message-view']
             updateTable(tableConfig, data['messages'])
@@ -94,79 +115,17 @@
 
         /* button JSON onClick() => show whole JSON data about everything which was parsed through all inventories */
         $('#btJSON').click( function() {
-            resetFilterTextField()
+            if (historyMgr.getParameter('view') != 'JSON') resetFilterTextField()
+            historyMgr.setParameters({view: 'JSON'})
             scrollableTable.clearTableContent()
             $('#detailView').html( JSON.stringify( data, null, 4) )
         })
-
-
-        /**
-         * filter functions 
-         */
-
-        var filterInfoText = "type to filter table"
-        resetFilterTextField()
-        function resetFilterTextField() {
-            $('#filterTextField').val('')
-            onblurFilterTable()
-        }
-        function onKeyDownFilterTable() { 
-            var value = $('#filterTextField').val()
-
-            if (value == filterInfoText) onfocusFilterTable()
-            else scrollableTable.filter($('#filterTextField').val()) 
-        }
-        function onKeyUpFilterTable() { 
-            var value = $('#filterTextField').val()
-
-            if (value == '') onblurFilterTable()
-            else if (value == filterInfoText) {
-                setCaretToPos( document.getElementById('filterTextField'), 0);
-                scrollableTable.filter('')
-            }
-            else {
-                scrollableTable.filter($('#filterTextField').val()) 
-            }
-        }
-        function onfocusFilterTable() {
-            if ($('#filterTextField').val() == filterInfoText) {
-                $('#filterTextField').val('')
-                $('#filterTextField').css('color', 'black') 
-            }
-        }
-        function onblurFilterTable() { 
-            if ($('#filterTextField').val() == '') { 
-                $('#filterTextField').css('color', 'grey') 
-                $('#filterTextField').val(filterInfoText)
-            }
-            if ($('#filterTextField').val() == filterInfoText) {
-                scrollableTable.filter('')
-            }
-        }
-
-        function setSelectionRange(input, selectionStart, selectionEnd) {
-            if (input.setSelectionRange) {
-                input.focus();
-                input.setSelectionRange(selectionStart, selectionEnd);
-            }
-            else if (input.createTextRange) {
-                var range = input.createTextRange();
-                range.collapse(true);
-                range.moveEnd('character', selectionEnd);
-                range.moveStart('character', selectionStart);
-                range.select();
-            }
-        }
-        function setCaretToPos(input, pos) {
-            setSelectionRange(input, pos, pos);
-        }
 
         /**
          * end filter functions 
          */
 
-        // Initially load host view
-        $('#btHosts').trigger( "click" );
+         historyMgr.triggerPageByParameters()
 
     </script>
  

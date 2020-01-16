@@ -325,7 +325,13 @@ var scrollableTable = function(id, wrapperId, enableLogging=false) {
         rowInfoArray.forEach((rowInfo) => {
 
             // Create TR
-            rowInfo.tableRow = $('<tr>').attr('id', rowInfo.rowId).attr('level', rowInfo.level).attr('parentId', rowInfo.parentRowId)
+            rowInfo.tableRow = $('<tr>')
+            
+            // add attributes
+            rowInfo.tableRow.attr('id', rowInfo.rowId)
+            rowInfo.tableRow.attr('level', rowInfo.level)
+            rowInfo.tableRow.attr('parentId', rowInfo.parentRowId)
+            rowInfo.tableRow.attr('findStr', rowInfo.dataEntry.inventory+';'+rowInfo.dataEntry.type+';'+rowInfo.dataEntry.name)
 
             setTableRowVisibility(rowInfo)
 
