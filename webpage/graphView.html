@@ -115,7 +115,7 @@
 
         graphs.forEach(graphData => {
 
-            console.log(graphData)
+            // console.log(graphData)
             viz.renderSVGElement(graphData, {engine: 'dot',format: 'svg'})
             .then(function(element) {
                 var td = document.createElement('td');
