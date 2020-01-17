@@ -50,6 +50,7 @@ class HistoryManager {
             if (TR != null) {
                 var TR_ID = TR.getAttribute('id')
                 $('#'+TR_ID).trigger('click')
+                TR.scrollIntoView()
             }
             else {
                 this.setParameters({selectedObject: ''})
