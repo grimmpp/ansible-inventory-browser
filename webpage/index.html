@@ -39,7 +39,7 @@
 
     <script type="text/javascript">
         
-        var historyMgr = new HistoryManager()
+        var historyMgr = new HistoryManager({view: 'Hosts', filter: '', selectedObject: ''})
 
         var loggingEnabled = false
         var scrollableTable = new scrollableTable('scrollableTable', 'wrapper', loggingEnabled)
@@ -113,7 +113,6 @@
 
         /* 
          * set history handler 
-         * IMPORTANT: order matters!!!
         */
 
         /* after loading a page with url parameters it pushes a button in order to call a view */
@@ -127,9 +126,11 @@
         })
 
         historyMgr.setHanlder('selectedObject', function(value){
-            var TR = $('#scrollableTable > tbody > tr[findStr="'+value+'"]')
-            TR.click()
-            TR.get(0).scrollIntoView({block: 'center', inline: 'center'})  // scroll to visible view
+            if (value != '') {
+                var TR = $('#scrollableTable > tbody > tr[findStr="'+value+'"]')
+                TR.click()
+                TR.get(0).scrollIntoView({block: 'center', inline: 'center'})  // scroll to visible view
+            }
         })
 
         /* end history handler */

@@ -1,10 +1,9 @@
 class HistoryManager {
 
-    constructor() {
-        this.urlParameterMap = {}
+    constructor(defaultPatamters = {}) {
+        this.urlParameterMap = defaultPatamters
         this.functionMap = {}
         this.loadUrlParameters()
-        // this.setDefaultUrlParameters()
     }
     /**
     * #view=hosts;
@@ -21,12 +20,6 @@ class HistoryManager {
                 this.urlParameterMap[key] = value
             })
         }
-    }
-
-    setDefaultUrlParameters() {
-        if(this.urlParameterMap['view'] == undefined) this.urlParameterMap['view'] = 'Hosts'
-        if(this.urlParameterMap['filter'] == undefined) this.urlParameterMap['filter'] = ''
-        if(this.urlParameterMap['selectedObject'] == undefined) this.urlParameterMap['selectedObject'] = ''
     }
 
     setHanlder(key, func) {
