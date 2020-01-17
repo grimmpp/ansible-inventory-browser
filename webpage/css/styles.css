@@ -22,16 +22,16 @@ body {
   padding: 6px;
 
   top: 60px;
-  left: 822px;
+  left: 821px;
   right: 20px;
-  bottom: 20px;
+  bottom: 18px;
 
   overflow: scroll;
   /* background-color: brown; */
 }
 
 #buttonBar {
-  position: fixed;
+  position: absolute;
   top: 20px;
   right: 20px;
   left: 20px;
@@ -43,6 +43,7 @@ body {
   border: 1px solid darkgrey;
 
   height: 31px;
+  z-index: 1;
 }
 
 #wrapper {

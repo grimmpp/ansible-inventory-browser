@@ -24,7 +24,15 @@
 </head>
 
 <body>
+    <h2 style="padding-left: 22px;">This diagram is clickable!</h2>
+    <div id="buttonBar">
+        <button id="btTableViews" onclick="location.href='index.html'">Table Views</button>
+    </div>
+    <p style="padding-left: 24px;">
+        This diagram is clickable! If you click on groups or node names you will be brought back to the table view. 
+    </p>
     <table id="graphs"><tr></tr></table>
+
     <script>
         var viz = new Viz();
         var graphs = []
