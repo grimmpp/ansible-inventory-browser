@@ -2,6 +2,7 @@ class HistoryManager {
 
     constructor() {
         this.urlParameterMap = {}
+        this.functionMap = {}
         this.loadUrlParameters()
         // this.setDefaultUrlParameters()
     }
@@ -28,34 +29,48 @@ class HistoryManager {
         if(this.urlParameterMap['selectedObject'] == undefined) this.urlParameterMap['selectedObject'] = ''
     }
 
+    setHanlder(key, func) {
+        this.functionMap[key] = func
+    }
+
     triggerPageByParameters() {
-        if(this.urlParameterMap['view'] != undefined) {
-            var view = this.urlParameterMap['view']
-            if (['Hosts', 'Groups', 'Analyse', 'JSON'].includes(view))
-            $('#bt'+view).trigger('click');
-        } 
-
-        if (this.urlParameterMap['filter'] != undefined) {
-            $('#filterTextField').val(this.urlParameterMap['filter'])
-            $('#filterTextField').trigger('keyup')
-        }
-
-        if(this.urlParameterMap['selectedObject']) {
-            // find row
-            var TR = null
-            $('#scrollableTable > tbody > tr').each( (index, _TR) => {
-                if (_TR.getAttribute('findStr') == this.urlParameterMap['selectedObject'] ) TR = _TR
-            })
-            
-            if (TR != null) {
-                var TR_ID = TR.getAttribute('id')
-                $('#'+TR_ID).trigger('click')
-                TR.scrollIntoView()
-            }
+        Object.keys(this.urlParameterMap).forEach(key => {
+            if (this.functionMap[key] !== undefined) {
+                var value = this.urlParameterMap[key]
+                this.functionMap[key](value)
+            } 
             else {
-                this.setParameters({selectedObject: ''})
+                console.log("There is no function set for url parameter %s", key)
             }
-        }
+        })
+
+        // if(this.urlParameterMap['view'] != undefined) {
+        //     var view = this.urlParameterMap['view']
+        //     if (['Hosts', 'Groups', 'Analyse', 'JSON'].includes(view))
+        //     $('#bt'+view).trigger('click');
+        // } 
+
+        // if (this.urlParameterMap['filter'] != undefined) {
+        //     $('#filterTextField').val(this.urlParameterMap['filter'])
+        //     $('#filterTextField').trigger('keyup')
+        // }
+
+        // if(this.urlParameterMap['selectedObject']) {
+        //     // find row
+        //     var TR = null
+        //     $('#scrollableTable > tbody > tr').each( (index, _TR) => {
+        //         if (_TR.getAttribute('findStr') == this.urlParameterMap['selectedObject'] ) TR = _TR
+        //     })
+            
+        //     if (TR != null) {
+        //         var TR_ID = TR.getAttribute('id')
+        //         $('#'+TR_ID).trigger('click')
+        //         TR.scrollIntoView()
+        //     }
+        //     else {
+        //         this.setParameters({selectedObject: ''})
+        //     }
+        // }
     }
 
     setParameters(map = {}) {

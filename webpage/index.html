@@ -45,17 +45,7 @@
         var scrollableTable = new scrollableTable('scrollableTable', 'wrapper', loggingEnabled)
         scrollableTable.setTableHeight( () => { return $( window ).height() - 118 } )
 
-        function filter() {
-            var value = $('#filterTextField').val()
-            scrollableTable.filter( value )
-            historyMgr.setParameters({filter: value})
-        }
-
-        function resetFilterTextField() {
-            $('#filterTextField').val('')
-            historyMgr.setParameters({filter: ''})
-        }
-
+        
         /** Generic function in order to fill table and tree view */
         function updateTable(tableConfig, data) {
             scrollableTable.setTableHeader(tableConfig['header'])
@@ -121,11 +111,47 @@
             $('#detailView').html( JSON.stringify( data, null, 4) )
         })
 
-        /**
-         * end filter functions 
-         */
+        /* 
+         * set history handler 
+         * IMPORTANT: order matters!!!
+        */
 
-         historyMgr.triggerPageByParameters()
+        /* after loading a page with url parameters it pushes a button in order to call a view */
+        historyMgr.setHanlder('view', function(view){
+            if (['Hosts', 'Groups', 'Analyse', 'JSON'].includes(view)) $('#bt'+view).trigger('click');
+        })
+
+        historyMgr.setHanlder('filter', function(value){
+            $('#filterTextField').val(value)
+            $('#filterTextField').trigger('keyup')
+        })
+
+        historyMgr.setHanlder('selectedObject', function(value){
+            var TR = $('#scrollableTable > tbody > tr[findStr="'+value+'"]')
+            TR.click()
+            TR.get(0).scrollIntoView({block: 'center', inline: 'center'})  // scroll to visible view
+        })
+
+        /* end history handler */
+        
+
+        /* filter functions  */
+
+        function filter() {
+            var value = $('#filterTextField').val()
+            scrollableTable.filter( value )
+            historyMgr.setParameters({filter: value})
+        }
+
+        function resetFilterTextField() {
+            $('#filterTextField').val('')
+            historyMgr.setParameters({filter: ''})
+        }
+
+        /* end filter functions  */
+
+
+        historyMgr.triggerPageByParameters()
 
     </script>
  

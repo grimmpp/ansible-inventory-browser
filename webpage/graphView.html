@@ -32,7 +32,7 @@
         function getUrlAttr(group, resourceType, resourceName) {
             var selectedObject = group.inventory+'%3B'+resourceType+'%3B'+resourceName;
             var url = 'index.html?view=Groups&#38;selectedObject='+selectedObject
-            if (resourceType=='host') url += '&#38;filter='+resourceName
+            // if (resourceType=='host') url += '&#38;filter='+resourceName
             return url
         }
 
