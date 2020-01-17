@@ -27,7 +27,10 @@ class TreeBuilder {
         }
 
         for (var i in node.hostnames) {
-            var host = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatHostList, node.inventory, node.hostnames[i]))
+            // var host = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatHostList, node.inventory, node.hostnames[i]))
+            // do not copy host entries because the same host can appear in different subtrees and we want to get all vars inherited. 
+            // Futhermore the hosts in the host list will get the vars as well.
+            var host = TreeBuilder._internal_findSubnode(flatHostList, node.inventory, node.hostnames[i])
             host.variables = Object.assign(host.variables, node.variables)
             node.nodes.push(host)
         }

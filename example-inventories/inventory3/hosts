@@ -5,10 +5,14 @@ all:
         southeast:
           children:
             atlanta:
+              vars:
+                atlanta_group_info: 42
               hosts:
                 host1:
                 host2:
             raleigh:
+              vars:
+                raleigh_group_info: 84
               hosts:
                 host2:
                 host3:

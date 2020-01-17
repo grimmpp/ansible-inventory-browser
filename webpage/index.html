@@ -55,13 +55,18 @@
 
         /** generic function which shows the json object in #detailedView */
         function showJsonData(event, eventData) {
+            // remove all selections
+            $('.scrollableTableSelectedRow').removeClass('scrollableTableSelectedRow')
             if (eventData != null) {
                 var tempObject = JSON.parse(JSON.stringify(eventData))
                 delete tempObject.data.nodes
                 $('#detailView').html( JSON.stringify( tempObject, null, 4) )
 
                 if (eventData.data.type == 'host' || eventData.data.type == 'group') {
-                    historyMgr.setParameters({selectedObject: eventData.data.inventory+';'+eventData.data.type+';'+eventData.data.name })
+                    var findStr = eventData.data.inventory+';'+eventData.data.type+';'+eventData.data.name
+                    // one host can be in different subtrees to highlight that the same host exists in different subtrees highlight them all.
+                    $('#scrollableTable > tbody > tr[findStr="'+findStr+'"]').addClass('scrollableTableSelectedRow')
+                    historyMgr.setParameters({selectedObject: findStr })
                 }
             }
             else {

@@ -45,16 +45,7 @@ class DataGenerator {
     
             ResourceHelper.addShortcuts(inv.name, 'host', inv.shortcutsConfig, inv.flatHostList)
             ResourceHelper.addShortcuts(inv.name, 'group', inv.shortcutsConfig, inv.flatGroupList)
-    
-            // TODO: generate tree view
-    
-    
-            // checkIfAllReourcesHaveSubfolders(path.join(directory, "host_vars"), "host")
-            // checkIfAllReourcesHaveSubfolders(path.join(directory, "group_vars"), "group")
-    
-            // console.dir(JSON.parse(JSON.stringify(inv.flatGroupList)), {depth: null, colors: true})
-            // console.dir(JSON.parse(JSON.stringify(inv.flatHostList)), {depth: null, colors: true})
-    
+       
             inventories.push(inv)
             data["hosts"].push.apply(data["hosts"], Object.values(inv.flatHostList))
             data["groups"].push.apply(data["groups"], Object.values(inv.flatGroupList))
