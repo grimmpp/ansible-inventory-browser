@@ -16,9 +16,9 @@ This project can parse ansible inventories and display them graphically on a web
   * **Sort and filter function** for all tables
   * **Custom Columns** in Host and Group View can be configured.
     * All attributes in the whole structure can be configured. (As example in the host view you can add a column about the iLO IP Address which is available but distributed in files called network under the folder host_vars.)
+ * **Graph View** realized with graphviz on [graphView.html](webpage/graphView.html)
       
 ### Planned features
-* Generation of graphs (Started doing it: [graphView.html](webpage/graphView.html), [graphView.png](graphView.png))
 * JSON highliting
 * Make inherited values visible.
 * Splitter btw tables and detail view.
@@ -37,6 +37,7 @@ In order to check out the [example inventories](/example-inventories) nothing ex
 
 This is how it will look like: <br/>
 <img src="screenshot-webui.jpg" width=800/>
+<img src="graphView.png" width=800 />
 
 ## How it works
 
