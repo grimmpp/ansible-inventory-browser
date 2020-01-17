@@ -59,7 +59,10 @@
                 var tempObject = JSON.parse(JSON.stringify(eventData))
                 delete tempObject.data.nodes
                 $('#detailView').html( JSON.stringify( tempObject, null, 4) )
-                historyMgr.setParameters({selectedObject: eventData.data.inventory+';'+eventData.data.type+';'+eventData.data.name })
+
+                if (eventData.data.type == 'host' || eventData.data.type == 'group') {
+                    historyMgr.setParameters({selectedObject: eventData.data.inventory+';'+eventData.data.type+';'+eventData.data.name })
+                }
             }
             else {
                 $('#detailView').html("")

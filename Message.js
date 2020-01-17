@@ -7,6 +7,7 @@ const colorRst = "\x1b[0m"
 class Message {
 
     constructor(issue, resourceType, resource, inventory, details){
+        this.type = 'message'
         this.issue = issue.toLowerCase()
         this.resourceType = resourceType.toLowerCase()
         this.resource = resource
