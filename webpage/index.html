@@ -32,7 +32,7 @@
                 style="color: grey; padding-left: 8px; height: 26px; " onkeyup="filter()" 
                 placeholder="type to filter table"
             ></span>
-            <a href="graphView.html" target="_blank">Graph View</a>
+            <button id="Graph" onclick="location.href='graphView.html'">Jump to Graph View</button>
         </div>
         <pre id="detailView" ></pre>
     </div>
@@ -68,52 +68,51 @@
         }
 
         /* button hosts onClick() => fill table with hosts */
-        $('#btHosts').click( function() {
-            if (historyMgr.getParameter('view') != 'Hosts') resetFilterTextField()
-            historyMgr.setParameters({view: 'Hosts'})
-            $('#detailView').text("")
-            var tableConfig = data['ui-config']['host-view']
-            updateTable(tableConfig, data['hosts'])
-        })
+        $('#btHosts').click( () => pushViewButton('Hosts', 'hosts', 'host-view') )
 
         /* event listener for 'selectedHost' => show JSON in host detailView */
         $( document ).on("selectedHost", showJsonData );
 
         /* button group onClick() => fill tree table with nested groups and hosts */
-        $('#btGroups').click( function() {
-            if (historyMgr.getParameter('view') != 'Groups') resetFilterTextField()
-            historyMgr.setParameters({view: 'Groups'})
-            $('#detailView').text("")
-            var tableConfig = data['ui-config']['group-view']
-            updateTable(tableConfig, data['trees'])
-        })
+        $('#btGroups').click( () => pushViewButton('Groups', 'trees', 'group-view') )
 
         /* event listener for 'selectedGroup' => show JSON of group in detailView */
         $( document ).on("selectedGroup", showJsonData );
 
         /* button analyse onClick() => fill table with messages which were generated during parsing of the inventories. */
-        $('#btAnalyse').click( function() {
-            if (historyMgr.getParameter('view') != 'Analyse') resetFilterTextField()
-            historyMgr.setParameters({view: 'Analyse'})
-            $('#detailView').text("")
-            var tableConfig = data['ui-config']['message-view']
-            updateTable(tableConfig, data['messages'])
-        })
+        $('#btAnalyse').click( () => pushViewButton('Analyse', 'messages', 'message-view') )
 
         /* event listener for 'selectedMessage' => show JSON of message in detailView */
         $( document ).on("selectedMessage", showJsonData );
 
         /* button JSON onClick() => show whole JSON data about everything which was parsed through all inventories */
         $('#btJSON').click( function() {
-            if (historyMgr.getParameter('view') != 'JSON') resetFilterTextField()
-            historyMgr.setParameters({view: 'JSON'})
+            refreshView('JSON')
+
             scrollableTable.clearTableContent()
             $('#detailView').html( JSON.stringify( data, null, 4) )
         })
 
-        /* 
-         * set history handler 
-        */
+        function refreshView(view) {
+            // clean up when showing the view the first time
+            if (historyMgr.getParameter('view') != view) {
+                resetFilterTextField()
+                historyMgr.setParameters({selectedObject: ''})
+            }
+            
+            historyMgr.setParameters({view: view})
+            $('#detailView').text("")
+        }
+
+        function pushViewButton(view, dataPart, configPart){
+            refreshView(view)
+
+            var tableConfig = data['ui-config'][configPart]
+            updateTable(tableConfig, data[dataPart])
+        }
+
+
+        /* set history handler */
 
         /* after loading a page with url parameters it pushes a button in order to call a view */
         historyMgr.setHanlder('view', function(view){
