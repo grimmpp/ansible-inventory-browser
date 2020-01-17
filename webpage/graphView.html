@@ -36,6 +36,7 @@
     <script>
         var viz = new Viz();
         var graphs = []
+        var nodeId = 0
 
         function getUrlAttr(group, resourceType, resourceName) {
             var selectedObject = group.inventory+'%3B'+resourceType+'%3B'+resourceName;
@@ -58,7 +59,7 @@
                 // enter hosts
                 group.hostnames.forEach(host => {
                     var url = getUrlAttr(group, 'host', host)
-                    graphData += '"'+host +'" [' + 'URL="'+url+'"; tooltip="'+url+'"; '
+                    graphData += '"'+host + (nodeId++) +'" [ label="'+host+'";' + 'URL="'+url+'"; tooltip="'+url+'"; '
                     graphData += 'style=filled; shape=rect; fillcolor=lightblue] '
                 })
 
