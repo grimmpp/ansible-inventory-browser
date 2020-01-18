@@ -52,7 +52,7 @@ class DataGenerator {
         }
     
         data["ui-config"] = config['ui-config']
-        data['inventory-config'] = config['inventory-config']
+        data['inventories'] = inventories
         data["messages"].push.apply(data["messages"], Message.getAllCreatedMessages())
     
         data["trees"] = TreeBuilder.build(data["groups"], data["hosts"])

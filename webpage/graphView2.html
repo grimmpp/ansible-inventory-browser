@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html">
+  <title>Ansible Inventory Browser - Graph View</title>
+  <meta name="author" content="Philipp Grimm">
+
+  <link rel="stylesheet" type="text/css" media="all" href="css/styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/scrollableTable.css">
+  
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  
+  <!-- https://github.com/grimmpp/sortable-and-scrollable-table-with-fixed-header -->
+  <script type="text/javascript" src="js/scrollableTable.js"></script>
+
+  <!-- pre-generated data which originally comes from the inventories -->
+  <script type="text/javascript" src="generated-data/data.js"></script>
+
+  <!-- https://github.com/mdaines/viz.js -->
+  <!-- https://github.com/mdaines/viz.js/wiki/Usage -->
+  <script type="text/javascript" src="js/viz.js"></script>
+  <script type="text/javascript" src="js/full.render.js"></script>
+</head>
+
+<body>
+    <h2 style="padding-left: 22px;">This diagram is clickable!</h2>
+    <div id="buttonBar">
+        <button id="btTableViews" onclick="location.href='index.html'">Table Views</button>
+        <button id="btGraph1" onclick="location.href='graphView.html'">Block Diagram</button>
+    </div>
+    <p style="padding-left: 24px;">
+        This diagram is clickable! If you click on groups or node names you will be brought back to the table view. 
+    </p>
+    <table id="graphs"><tr></tr></table>
+
+    <script>
+        var viz = new Viz();
+        var graphs = []
+        var nodeId = 0
+
+        function getUrlAttr(node) {
+            var selectedObject = node.inventory+'%3B'+node.type+'%3B'+node.name;
+            var url = 'index.html?view=Groups&#38;selectedObject='+selectedObject
+            // if (resourceType=='host') url += '&#38;filter='+resourceName
+            return url
+        }
+
+        /**
+         * Helpful dot / graphviz docs https://www.graphviz.org/doc/info/attrs.html
+         */
+        function drawGroupNode(group) {
+            var url = getUrlAttr(group, 'group', group.name)
+            
+            var graphData = ''
+            var groupNodeName = group.name
+            graphData += '"'+groupNodeName+'" [ label="'+group.name+'"; '
+            graphData += ' URL="'+url+'"; '
+            graphData += ' fillcolor="#55ff55"; style=filled;  tooltip="'+getVariablesAsTooltip(group)+'"; ] \n'
+
+            return graphData
+        }
+
+        function getVariablesAsTooltip(node) {
+            var tt = 'Variables: \n'
+            for(var varName in node.variables){
+                tt += varName+': '+node.variables[varName]+'\n'
+            }
+            return tt
+        }
+
+        function drawHostNode(host) {
+            var graphData = ''
+            var nodeName = host.name
+            var url = getUrlAttr(host)
+
+            graphData += '"'+nodeName+'" [ label="'+host.name+'"; '
+            graphData += ' URL="'+url+'"; '
+            graphData += ' fillcolor=lightblue; style=filled; shape=rect; tooltip="'+getVariablesAsTooltip(host)+'"; ] \n'
+
+            return graphData
+        }
+
+        function drawRelation(parentNode, node) {
+            return ' "'+parentNode.name+'" -> "'+node.name+'"; \n'
+        }
+
+        function drawNodes(inventory, node, parentNode=null) {
+            var graphData = ''
+
+            if (node.inventory == inventory) {
+                if (node.type == 'group') {
+                    graphData += drawGroupNode(node)
+
+                    node.nodes.forEach(subNode => {
+                        graphData += drawNodes(inventory, subNode, node)
+                    })
+                }
+                // host
+                else {
+                    graphData += drawHostNode(node)
+                }
+
+                if (parentNode != null) {
+                    graphData += drawRelation(parentNode, node)
+                }
+
+            }
+
+            return graphData
+        }
+
+        data['inventories'].forEach(inventory => {
+
+            // graphData += 'subgraph cluster_'+inventory.env+' { style=dashed; label = "'+inventory.env+'"; '
+            var graphData = ''
+            graphData += ' digraph "'+inventory.name+'" { rankdir=TB; splines=False; style=dashed; '
+            graphData += ' subgraph cluster_'+inventory.name+' { '
+            graphData += ' style=dashed; label = "'+inventory.name+'"; '
+            graphData += ' URL="index.html?view=Groups&#38;filter='+inventory.name+'" \n'
+
+            // for(var g in inventory.flatGroupList) {
+            //     graphData += drawGroupNode(inventory.flatGroupList[g])
+            // }
+
+            data['trees'].forEach(node => {
+                graphData += drawNodes(inventory.name, node)
+            })   //end group
+
+            graphData += ' } } '   // close inventory 
+
+            graphs.push(graphData)
+        });
+        // graphData += '} '   // close graph
+
+        // graphData = 'digraph D { subgraph cluster_c2 {    label = "Child two";    e;  }}'
+        // graphData = 'digraph envs { subgraph cluster_env1 { label = "env1"; node_env1; }}'
+
+        
+
+        graphs.forEach(graphData => {
+
+            // console.log(graphData)
+            viz.renderSVGElement(graphData, {engine: 'dot',format: 'svg'})
+            .then(function(element) {
+                var tr = document.createElement('tr');
+                var td = document.createElement('td');
+                td.setAttribute('valign', 'top')
+                tr.appendChild(td)
+                td.appendChild(element);
+                document.getElementById('graphs').appendChild(tr)
+            })
+            .catch(error => {
+                // Create a new Viz instance (@see Caveats page for more info)
+                viz = new Viz();
+
+                // Possibly display the error
+                console.error(error);
+            });
+        })
+    </script>
+
+</body>
+</html>

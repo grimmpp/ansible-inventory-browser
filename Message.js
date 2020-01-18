@@ -11,7 +11,7 @@ class Message {
         this.issue = issue.toLowerCase()
         this.resourceType = resourceType.toLowerCase()
         this.resource = resource
-        this.inventory = inventory
+        this.inventory = inventory.split('/').pop()
         this.details = details
     }
 

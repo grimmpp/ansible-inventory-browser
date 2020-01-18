@@ -45,7 +45,7 @@ class Group {
     // This method generates a flat list of all groups from the hosts ini-file. 
     // All configuration and variables will be parsed and attached.
     static generateFlatGroupListFromIniFile(inventoryDir, environment) {
-        const inventory = inventoryDir.split(path.sep).pop()
+        const inventory = inventoryDir.split('/').pop()
         const hostsIni = loadIniFile.sync( path.join(inventoryDir, 'hosts') )
         var groupList = {}
     
@@ -96,7 +96,7 @@ class Group {
     // This method generates a flat list of all groups from the hosts yaml-file. 
     // All configuration and variables will be parsed and attached.
     static generateFlatGroupListFromYamlFile(inventoryDir, environment) {
-        const inventory = inventoryDir.split(path.sep).pop()
+        const inventory = inventoryDir.split('/').pop()
         const yamlFullFilename = path.join(inventoryDir, 'hosts')
         const hostsyaml = YAML.parse(  fs.readFileSync(yamlFullFilename, 'utf8') )
         var groupList = {}
@@ -154,7 +154,7 @@ class Group {
     }
 
     static internal_addVariablesFromFolder(inventoryDir, environment, groupList) {
-        const inventory = inventoryDir.split(path.sep).pop()
+        const inventory = inventoryDir.split('/').pop()
         var addUnknownGroup = function(folderName) { groupList[folderName] = new Group(inventory, environment, folderName); return true }
 
         ConfigFileReader.addVariablesFromFolder(inventoryDir, "group_vars", "group", groupList, addUnknownGroup)
@@ -179,7 +179,7 @@ class Group {
     }
 
     static internal_addGroupUngroupedIfNotExist(inventoryDir, environment, groupList) {
-        const inventory = inventoryDir.split(path.sep).pop()
+        const inventory = inventoryDir.split('/').pop()
 
         if (groupList['ungrouped'] === undefined) {
             groupList['ungrouped'] = new Group(inventory, environment, 'ungrouped')

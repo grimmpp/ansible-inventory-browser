@@ -16,7 +16,7 @@ class Host {
     }
 
     static generateHostListFromIniFile(inventoryDir, environment) {
-        const inventory = inventoryDir.split(path.sep).pop()
+        const inventory = inventoryDir.split('/').pop()
         const hostsIni = loadIniFile.sync( path.join(inventoryDir, 'hosts') )
         var hostList = {}
 
@@ -74,7 +74,7 @@ class Host {
     }
 
     static generateHostListFromYamlFile(inventoryDir, environment) {
-        const inventory = inventoryDir.split(path.sep).pop()
+        const inventory = inventoryDir.split('/').pop()
         const yamlFullFilename = path.join(inventoryDir, 'hosts')
         const hostsyaml = YAML.parse(  fs.readFileSync(yamlFullFilename, 'utf8') )
         var hostList = {}
@@ -125,7 +125,7 @@ class Host {
     }
 
     static internal_addVariablesFromFolder(inventoryDir, environment, hostList) {
-        const inventory = inventoryDir.split(path.sep).pop()
+        const inventory = inventoryDir.split('/').pop()
         var addUngroupedHosts = function(folderName) { hostList[folderName] = new Host(inventory, environment, folderName); return true }
 
         ConfigFileReader.addVariablesFromFolder(inventoryDir, "host_vars", "host", hostList, addUngroupedHosts)
