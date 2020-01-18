@@ -39,6 +39,7 @@ In order to check out the [example inventories](/example-inventories) nothing ex
 This is how it will look like: <br/>
 <img src="screenshot-webui.jpg" width=800/>
 <img src="graphView.png" width=800 />
+<img src="graphView2.png" width=800 />
 
 ## How it works
 
