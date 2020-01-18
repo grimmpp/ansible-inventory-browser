@@ -56,8 +56,11 @@
 
         /** generic function which shows the json object in #detailedView */
         function showJsonData(event, eventData) {
-            // remove all selections
+            // remove all selections which were added in this function
             $('.scrollableTableSelectedRow').removeClass('scrollableTableSelectedRow')
+            // set originally selected row again
+            $('#'+eventData.rowId).addClass('scrollableTableSelectedRow')
+            
             if (eventData != null) {
                 var tempObject = JSON.parse(JSON.stringify(eventData))
                 delete tempObject.data.nodes
