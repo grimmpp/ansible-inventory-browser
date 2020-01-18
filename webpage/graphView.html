@@ -86,10 +86,8 @@
                 tt += '\t'.repeat(2*level)+'• '
                 tt += varName+': '
                 var value = vars[varName]
-                if (typeof value == 'string') tt += value + '\n'
-                else {
-                    tt += '\n' + getVariablesAsTooltip(value, level+1)
-                }
+                if (typeof value == 'object') tt += '\n' + getVariablesAsTooltip(value, level+1)
+                else tt += value + '\n'
             }
             return tt
         }
