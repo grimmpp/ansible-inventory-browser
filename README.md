@@ -9,6 +9,7 @@ This project can parse ansible inventories and display them graphically on a web
   * What can be seen on the WebUI:
     * **Host list**
     * **Groups and hosts treeview**
+      * Hosts can appear in many groups when a host is selected all representations will be marked.
     * List of **parser information**
     * Whole **structured WebUI data** as json
     * **Detail view** which shows all information about selected hosts or groups
