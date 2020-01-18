@@ -56,15 +56,22 @@
             var groupNodeName = group.name
             graphData += '"'+groupNodeName+'" [ label="'+group.name+'"; '
             graphData += ' URL="'+url+'"; '
-            graphData += ' fillcolor="#55ff55"; style=filled;  tooltip="'+getVariablesAsTooltip(group)+'"; ] \n'
+            graphData += ' fillcolor="#55ff55"; style=filled; tooltip="'+getVariablesAsTooltip(group.variables)+'"; ] \n'
 
             return graphData
         }
 
-        function getVariablesAsTooltip(node) {
-            var tt = 'Variables: \n'
-            for(var varName in node.variables){
-                tt += varName+': '+node.variables[varName]+'\n'
+        function getVariablesAsTooltip(vars, level=1) {
+            var tt = ''
+            if (level == 1) tt += 'Variables: \n'
+            for(var varName in vars){
+                tt += '\t'.repeat(2*level)+'• '
+                tt += varName+': '
+                var value = vars[varName]
+                if (typeof value == 'string') tt += value + '\n'
+                else {
+                    tt += '\n' + getVariablesAsTooltip(value, level+1)
+                }
             }
             return tt
         }
@@ -76,7 +83,7 @@
 
             graphData += '"'+nodeName+'" [ label="'+host.name+'"; '
             graphData += ' URL="'+url+'"; '
-            graphData += ' fillcolor=lightblue; style=filled; shape=rect; tooltip="'+getVariablesAsTooltip(host)+'"; ] \n'
+            graphData += ' fillcolor=lightblue; style=filled; shape=rect; tooltip="'+getVariablesAsTooltip(host.variables)+'"; ] \n'
 
             return graphData
         }

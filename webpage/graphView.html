@@ -58,13 +58,15 @@
                 var url = getUrlAttr(group, 'group', group.name)
                 graphData += 'subgraph cluster_'+groupName+' { '
                 graphData += 'URL="'+url+'"; '
-                graphData += 'fillcolor="#'+cv+'ff'+cv+'"; style=filled; label = "'+group.name+'"; tooltip="'+getVariablesAsTooltip(group)+'"; '
+                graphData += 'fillcolor="#'+cv+'ff'+cv+'"; style=filled; label = "'+group.name+'"; tooltip="'+getVariablesAsTooltip(group.variables)+'"; '
 
                 // enter hosts
-                group.hostnames.forEach(host => {
-                    var url = getUrlAttr(group, 'host', host)
-                    graphData += '"'+host + (nodeId++) +'" [ label="'+host+'";' + 'URL="'+url+'"; tooltip="'+url+'"; '
-                    graphData += 'style=filled; shape=rect; fillcolor=lightblue; tooltip="'+getVariablesAsTooltip(host)+'"; ] '
+                group.hostnames.forEach(hostname => {
+                    var url = getUrlAttr(group, 'host', hostname)
+                    var nodeName = hostname + (nodeId++)
+                    var host = findHost(inventoryName, hostname)
+                    graphData += '"'+nodeName+'" [ label="'+hostname+'";' + 'URL="'+url+'"; tooltip="'+url+'"; '
+                    graphData += 'style=filled; shape=rect; fillcolor=lightblue; tooltip="'+getVariablesAsTooltip(host.variables)+'"; ] '
                 })
 
                 group.nodes.forEach(subgroup => {
@@ -77,12 +79,23 @@
             return graphData
         }
 
-        function getVariablesAsTooltip(node) {
-            var tt = 'Variables: \n'
-            for(var varName in node.variables){
-                tt += varName+': '+node.variables[varName]+'\n'
+        function getVariablesAsTooltip(vars, level=1) {
+            var tt = ''
+            if (level == 1) tt += 'Variables: \n'
+            for(var varName in vars){
+                tt += '\t'.repeat(2*level)+'• '
+                tt += varName+': '
+                var value = vars[varName]
+                if (typeof value == 'string') tt += value + '\n'
+                else {
+                    tt += '\n' + getVariablesAsTooltip(value, level+1)
+                }
             }
             return tt
+        }
+
+        function findHost(inventoryName, hostname) {
+            return data['hosts'].find(n => n.inventory == inventoryName && n.name == hostname)
         }
 
         data['inventories'].forEach(inventory => {
