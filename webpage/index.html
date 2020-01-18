@@ -18,6 +18,11 @@
   <script type="text/javascript" src="generated-data/data.js"></script>
 
   <script type="text/javascript" src="js/HistoryManager.js"></script>
+
+    <!-- https://highlightjs.org/static/demo/ -->
+  <link rel="stylesheet" href="js/highlight/styles/googlecode.css">
+  <script src="js/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
 
 <body>
@@ -36,7 +41,7 @@
     </div>
 
     <div id="wrapper"></div>
-    <pre id="detailView" ></pre>
+    <pre ><code id="detailView" class="lang-JSON" style="background-color: #ddd;" ></code></pre>
 
     <script type="text/javascript">
         
@@ -60,7 +65,7 @@
             $('.scrollableTableSelectedRow').removeClass('scrollableTableSelectedRow')
             // set originally selected row again
             $('#'+eventData.rowId).addClass('scrollableTableSelectedRow')
-            
+
             if (eventData != null) {
                 var tempObject = JSON.parse(JSON.stringify(eventData))
                 delete tempObject.data.nodes
@@ -72,6 +77,9 @@
                     $('#scrollableTable > tbody > tr[findStr="'+findStr+'"]').addClass('scrollableTableSelectedRow')
                     historyMgr.setParameters({selectedObject: findStr })
                 }
+
+                // refresh json highlighting
+                hljs.highlightBlock( document.getElementById('detailView') )
             }
             else {
                 $('#detailView').html("")
@@ -103,6 +111,9 @@
 
             scrollableTable.clearTableContent()
             $('#detailView').html( JSON.stringify( data, null, 4) )
+
+            // refresh json highlighting
+            hljs.highlightBlock( document.getElementById('detailView') )
         })
 
         function refreshView(view) {
