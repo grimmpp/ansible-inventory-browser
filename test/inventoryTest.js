@@ -180,4 +180,28 @@ describe('#inventoryTest()', function() {
 
         expect( emptySubgroups.length + parentGroups.length ).to.equal(groupCount)
     })
+
+    it('check host2 in inventory3', function() {
+        const inventoryName = 'inventory3'
+        const hostName = 'host2'
+        var host2 = data['hosts'].find(h => h.inventory == inventoryName && h.name == hostName)
+        
+        expect( host2.groups.length ).to.equal(2)
+        expect( host2.groups.includes('atlanta') ).to.true
+        expect( host2.groups.includes('raleigh') ).to.true
+
+        // check inherited vars
+        expect( Object.keys(host2.variables).length ).to.equal(6)
+        expect( host2.variables['atlanta_group_info'] ).to.equal(42)
+        expect( host2.variables['raleigh_group_info'] ).to.equal(84)
+
+        var groupAtlanta = data['groups'].find(h => h.inventory == inventoryName && h.name == 'atlanta')
+        expect( groupAtlanta.variables['atlanta_group_info'] ).to.equal(42)
+        expect( Object.keys(groupAtlanta.variables).length ).to.equal(1)
+
+        var groupRaleigh = data['groups'].find(h => h.inventory == inventoryName && h.name == 'raleigh')
+        expect( Object.keys(groupRaleigh.variables).length ).to.equal(1)
+        expect( groupRaleigh.variables['raleigh_group_info'] ).to.equal(84)
+
+    })
 })
