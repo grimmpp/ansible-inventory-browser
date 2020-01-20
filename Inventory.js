@@ -2,10 +2,12 @@ const path = require('path')
 
 class Inventory {
     constructor(config) {
-        this.name = config.dir.split('/').pop()
-        this.dir = config.dir
+        this.filenameFullPath = config['hosts-file']
+        this.filename = path.basename(this.filenameFullPath)
+        this.dir = path.dirname(this.filenameFullPath)
+        this.name = this.dir.split('/').pop()
         this.env = config.env
-        this.hostsFileFormat = config['hosts-file-format'] === undefined ? 'ini' : config['hosts-file-format']
+        this.hostsFileFormat = path.extname(this.filename).length == 0 ? 'ini' : this.filename.split('.').pop()
         this.shortcutsConfig = config['shortcuts']
 
         this.flatHostList = {}

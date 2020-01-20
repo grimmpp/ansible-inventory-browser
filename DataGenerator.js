@@ -27,20 +27,21 @@ class DataGenerator {
     
         for (var index in inventoryConfig) {
             var inv = new Inventory(inventoryConfig[index])
+            // console.dir(inv)
     
             if (Message.isLoggingEnabled()) console.log("%sParse%s hosts file ('%s%s%s'): '%s%s%s' for inventory '%s%s%s'", 
                 colorG,colorRst, colorG,inv.hostsFileFormat,colorRst, colorB,inv.dir,colorRst, colorB,inv.name,colorRst)
     
             if (inv.isIniHostsFileFormat()) {
-                inv.flatGroupList = Group.generateFlatGroupListFromIniFile(inv.dir, inv.env)
-                inv.flatHostList = Host.generateHostListFromIniFile(inv.dir, inv.env)
+                inv.flatGroupList = Group.generateFlatGroupListFromIniFile(inv)
+                inv.flatHostList = Host.generateHostListFromIniFile(inv)
                 
             } else if (inv.isYamlHostsFileFormat()) {
-                inv.flatGroupList = Group.generateFlatGroupListFromYamlFile(inv.dir, inv.env)
-                inv.flatHostList = Host.generateHostListFromYamlFile(inv.dir, inv.env)
+                inv.flatGroupList = Group.generateFlatGroupListFromYamlFile(inv)
+                inv.flatHostList = Host.generateHostListFromYamlFile(inv)
     
             } else {
-                Message.create("error", "parser", "parser", inv.name, "parsing error: hosts file format from inventory '"+inv.name+"' unknown.", verboseLogging)
+                Message.create("error", "parser", "parser", inv.name, "parsing error: hosts file format from inventory '"+inv.name+"' unknown.")
             }
     
             ResourceHelper.addShortcuts(inv.name, 'host', inv.shortcutsConfig, inv.flatHostList)

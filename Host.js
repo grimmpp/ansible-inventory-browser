@@ -15,9 +15,8 @@ class Host {
         this.variables = {}
     }
 
-    static generateHostListFromIniFile(inventoryDir, environment) {
-        const inventory = inventoryDir.split('/').pop()
-        const hostsIni = loadIniFile.sync( path.join(inventoryDir, 'hosts') )
+    static generateHostListFromIniFile(inventory) {
+        const hostsIni = loadIniFile.sync( path.join(inventory.filenameFullPath) )
         var hostList = {}
 
         for (var groupName in hostsIni) {
@@ -27,7 +26,7 @@ class Host {
                     if (Host.isValidHostname(hostname)) {
                         // add host if not exists
                         if (hostList[hostname] === undefined) {
-                            hostList[hostname] = new Host(inventory, environment, hostname, groupName)
+                            hostList[hostname] = new Host(inventory.name, inventory.env, hostname, groupName)
                         }
 
                         // add additional group
@@ -49,7 +48,7 @@ class Host {
                     else {
                         var _hostname = this.getHostnameOutOfConfigPart(hostname)
                         if (hostList[_hostname] === undefined) {
-                            hostList[_hostname] = new Host(inventory, environment, _hostname, groupName)
+                            hostList[_hostname] = new Host(inventory.name, inventory.env, _hostname, groupName)
                         }
 
                         // get variables out of the same line like the host name
@@ -66,36 +65,34 @@ class Host {
         }
 
         // add variables and configuration from subfolder host_vars
-        Host.internal_addVariablesFromFolder(inventoryDir, environment, hostList)
+        Host.internal_addVariablesFromFolder(inventory, hostList)
 
         // console.log("Host List: ")
         // console.dir(JSON.parse(JSON.stringify(hostList)), {depth: null, colors: true})
         return hostList
     }
 
-    static generateHostListFromYamlFile(inventoryDir, environment) {
-        const inventory = inventoryDir.split('/').pop()
-        const yamlFullFilename = path.join(inventoryDir, 'hosts')
-        const hostsyaml = YAML.parse(  fs.readFileSync(yamlFullFilename, 'utf8') )
+    static generateHostListFromYamlFile(inventory) {
+        const hostsyaml = YAML.parse(  fs.readFileSync(inventory.filenameFullPath, 'utf8') )
         var hostList = {}
 
-        Host.internal_generateHostListFromYamlFile(hostsyaml, inventory, environment, hostList)
+        Host.internal_generateHostListFromYamlFile(hostsyaml, inventory, hostList)
 
         // add variables and configuration from subfolder host_vars
-        Host.internal_addVariablesFromFolder(inventoryDir, environment, hostList)
+        Host.internal_addVariablesFromFolder(inventory, hostList)
 
         // console.log("Host List from Yaml: ")
         // console.dir(JSON.parse(JSON.stringify(hostList)), {depth: null, colors: true})
         return hostList
     }
     
-    static internal_generateHostListFromYamlFile(hostsyaml, inventory, environment, hostList) {
+    static internal_generateHostListFromYamlFile(hostsyaml, inventory, hostList) {
         for (var groupName in hostsyaml) {
 
             if (hostsyaml[groupName] != null) {
                 if (hostsyaml[groupName]["children"] != undefined) {
                     for(var subGroupName in hostsyaml[groupName]["children"]) {
-                        Host.internal_generateHostListFromYamlFile(hostsyaml[groupName]["children"], inventory, environment, hostList)
+                        Host.internal_generateHostListFromYamlFile(hostsyaml[groupName]["children"], inventory, hostList)
                     }
                 }
                 
@@ -104,7 +101,7 @@ class Host {
                     for(var hostname in hostsyaml[groupName]["hosts"]) {
                         // add host
                         if (hostList[hostname] === undefined) {
-                            hostList[hostname] = new Host(inventory, environment, hostname, groupName)
+                            hostList[hostname] = new Host(inventory.name, inventory.env, hostname, groupName)
                         }
 
                         // add group
@@ -124,13 +121,13 @@ class Host {
         return hostList
     }
 
-    static internal_addVariablesFromFolder(inventoryDir, environment, hostList) {
-        const inventory = inventoryDir.split('/').pop()
-        var addUngroupedHosts = function(folderName) { hostList[folderName] = new Host(inventory, environment, folderName); return true }
+    static internal_addVariablesFromFolder(inventory, hostList) {
+        var addUngroupedHosts = function(folderName) { hostList[folderName] = new Host(inventory.name, inventory.env, folderName); return true }
 
-        ConfigFileReader.addVariablesFromFolder(inventoryDir, "host_vars", "host", hostList, addUngroupedHosts)
+        ConfigFileReader.addVariablesFromFolder(inventory.dir, "host_vars", "host", hostList, addUngroupedHosts)
     }
 
+    // TODO: remove ???
     static addConfigFromHostVarsDir(inventoryDir, hostList) {
 
     }

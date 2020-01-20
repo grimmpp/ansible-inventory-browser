@@ -20,7 +20,7 @@ class Message {
         Message.loggingEnabled = false
     }
 
-    static create(issue, resourceType, resource, inventory, details, forceLogOutput=false) {
+    static create(issue, resourceType, resource, inventory, details, forceLogOutput=Message.loggingEnabled) {
         var msg = new Message(issue, resourceType, resource, inventory, details)
 
         if (Message.loggingEnabled || forceLogOutput) {

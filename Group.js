@@ -44,16 +44,15 @@ class Group {
 
     // This method generates a flat list of all groups from the hosts ini-file. 
     // All configuration and variables will be parsed and attached.
-    static generateFlatGroupListFromIniFile(inventoryDir, environment) {
-        const inventory = inventoryDir.split('/').pop()
-        const hostsIni = loadIniFile.sync( path.join(inventoryDir, 'hosts') )
+    static generateFlatGroupListFromIniFile(inventory) {
+        const hostsIni = loadIniFile.sync( inventory.filenameFullPath )
         var groupList = {}
     
         for (var groupName in hostsIni) {
             var _groupName = Group.normalizeGroupName(groupName)
     
             if (groupList[_groupName] === undefined) {
-                groupList[_groupName] = new Group(inventory, environment, groupName)
+                groupList[_groupName] = new Group(inventory.name, inventory.env, groupName)
             }
     
             if (Group.hasHosts(groupName)) {
@@ -68,7 +67,7 @@ class Group {
                     groupList[_groupName].subgroups.push(subGroupName)
                     // need to add goups here as well because they may be listed only as subgroups
                     if (groupList[subGroupName] === undefined) {
-                        groupList[subGroupName] = new Group(inventory, environment, subGroupName)
+                        groupList[subGroupName] = new Group(inventory.name, inventory.env, subGroupName)
                     }
                 }
             } else if (Group.hasGroupVariables(groupName)) {
@@ -82,11 +81,11 @@ class Group {
         }
 
         // add variables and configuration from subfolder group_vars
-        Group.internal_addVariablesFromFolder(inventoryDir, environment, groupList)
+        Group.internal_addVariablesFromFolder(inventory, groupList)
 
-        Group.internal_addGroupAllIfNotExist(inventory, environment, groupList)
+        Group.internal_addGroupAllIfNotExist(inventory, groupList)
 
-        Group.internal_addGroupUngroupedIfNotExist(inventoryDir, environment, groupList)
+        Group.internal_addGroupUngroupedIfNotExist(inventory, groupList)
     
         // console.log("Flat Group List: ")
         // console.dir(JSON.parse(JSON.stringify(groupList)), {depth: null, colors: true})
@@ -95,30 +94,28 @@ class Group {
 
     // This method generates a flat list of all groups from the hosts yaml-file. 
     // All configuration and variables will be parsed and attached.
-    static generateFlatGroupListFromYamlFile(inventoryDir, environment) {
-        const inventory = inventoryDir.split('/').pop()
-        const yamlFullFilename = path.join(inventoryDir, 'hosts')
-        const hostsyaml = YAML.parse(  fs.readFileSync(yamlFullFilename, 'utf8') )
+    static generateFlatGroupListFromYamlFile(inventory) {
+        const hostsyaml = YAML.parse(  fs.readFileSync( inventory.filenameFullPath, 'utf8') )
         var groupList = {}
 
-        Group.internal_generateFlatGroupListFromYamlFile(hostsyaml, inventory, environment, groupList)
+        Group.internal_generateFlatGroupListFromYamlFile(hostsyaml, inventory, groupList)
 
-        Group.internal_addGroupAllIfNotExist(inventory, environment, groupList)
+        Group.internal_addGroupAllIfNotExist(inventory, groupList)
 
-        Group.internal_addGroupUngroupedIfNotExist(inventoryDir, environment, groupList)
+        Group.internal_addGroupUngroupedIfNotExist(inventory, groupList)
         
         // console.log("Flat Group List from yaml: ")
         // console.dir(JSON.parse(JSON.stringify(groupList)), {depth: null, colors: true})
         return groupList
     }
 
-    static internal_generateFlatGroupListFromYamlFile(hostsyaml, inventory, environment, groupList) {
+    static internal_generateFlatGroupListFromYamlFile(hostsyaml, inventory, groupList) {
 
         for (var groupName in hostsyaml) {
 
             // add group if not exits
             if (groupList[groupName] === undefined) {
-                groupList[groupName] = new Group(inventory, environment, groupName)
+                groupList[groupName] = new Group(inventory.name, inventory.env, groupName)
             }
 
             if (hostsyaml[groupName] != null) {
@@ -128,7 +125,7 @@ class Group {
                         if (!(groupList[groupName].subgroups.includes(subGroupName))) {
                             groupList[groupName].subgroups.push(subGroupName)
                         }
-                        Group.internal_generateFlatGroupListFromYamlFile(hostsyaml[groupName]["children"], inventory, environment, groupList)
+                        Group.internal_generateFlatGroupListFromYamlFile(hostsyaml[groupName]["children"], inventory, groupList)
                     }
                 }
 
@@ -153,16 +150,15 @@ class Group {
         return groupList
     }
 
-    static internal_addVariablesFromFolder(inventoryDir, environment, groupList) {
-        const inventory = inventoryDir.split('/').pop()
-        var addUnknownGroup = function(folderName) { groupList[folderName] = new Group(inventory, environment, folderName); return true }
+    static internal_addVariablesFromFolder(inventory, groupList) {
+        var addUnknownGroup = function(folderName) { groupList[folderName] = new Group(inventory.name, inventory.env, folderName); return true }
 
-        ConfigFileReader.addVariablesFromFolder(inventoryDir, "group_vars", "group", groupList, addUnknownGroup)
+        ConfigFileReader.addVariablesFromFolder(inventory.dir, "group_vars", "group", groupList, addUnknownGroup)
     }
 
-    static internal_addGroupAllIfNotExist(inventory, environment, groupList) {
+    static internal_addGroupAllIfNotExist(inventory, groupList) {
         if (groupList['all'] === undefined) {
-            groupList['all'] = new Group(inventory, environment, 'all')
+            groupList['all'] = new Group(inventory.name, inventory.env, 'all')
         }
 
         // add all subgroups
@@ -178,15 +174,13 @@ class Group {
         }
     }
 
-    static internal_addGroupUngroupedIfNotExist(inventoryDir, environment, groupList) {
-        const inventory = inventoryDir.split('/').pop()
-
+    static internal_addGroupUngroupedIfNotExist(inventory, groupList) {
         if (groupList['ungrouped'] === undefined) {
-            groupList['ungrouped'] = new Group(inventory, environment, 'ungrouped')
+            groupList['ungrouped'] = new Group(inventory.name, inventory.env, 'ungrouped')
         }
 
         // find hosts which are not in a group
-        const directoryPath = path.join(inventoryDir, 'host_vars');
+        const directoryPath = path.join(inventory.dir, 'host_vars');
         if( fs.existsSync(directoryPath)) {
             fs.readdirSync(directoryPath).forEach(function(hostname) {
                 if (fs.lstatSync(path.join(directoryPath, hostname)).isDirectory()) {
@@ -197,7 +191,7 @@ class Group {
                         }
                     }
                 } else {
-                    Message.create("warning", "folder structure", hostname, inventory, "Ignore file '"+hostname+"' in 'host_vars'!")
+                    Message.create("warning", "folder structure", hostname, inventory.name, "Ignore file '"+hostname+"' in 'host_vars'!")
                 }
             })
         }
