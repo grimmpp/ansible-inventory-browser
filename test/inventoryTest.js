@@ -129,28 +129,28 @@ describe('#inventoryTest()', function() {
         }
 
         var host = findHostByName(hosts, 'host1')
-        expect( Object.keys( host.variables).length ).to.equal(3)
+        expect( Object.keys( host.variables).length ).to.equal(9) // incl. group vars
         expect( host.variables['http_port'] ).to.equal('80')
         expect( host.variables['maxRequestsPerChild'] ).to.equal('808')
         expect( host.variables['ssh_port'] ).to.equal('22')
 
         host = findHostByName(hosts, 'host2')
-        expect( Object.keys( host.variables).length ).to.equal(2)
+        expect( Object.keys( host.variables).length ).to.equal(8) // incl. group vars
         expect( host.variables['http_port'] ).to.equal('303')
         expect( host.variables['maxRequestsPerChild'] ).to.equal('909')
 
         host = findHostByName(hosts, 'host3')
-        expect( Object.keys( host.variables).length ).to.equal(0)
+        expect( Object.keys( host.variables).length ).to.equal(4)    // incl. group vars
 
         host = findHostByName(hosts, 'jumper')
-        expect( Object.keys( host.variables).length ).to.equal(2)
+        expect( Object.keys( host.variables).length ).to.equal(6)    // incl. group vars
         expect( host.variables['ansible_port'] ).to.equal('5555')
         expect( host.variables['ansible_host'] ).to.equal('192.0.2.50')
 
         const hostsWithoutVariables = ['host3']
         for(var i in hostsWithoutVariables) {
             host = findHostByName(hosts, hostsWithoutVariables[i])
-            expect( Object.keys( host.variables ).length ).to.equal(0)
+            expect( Object.keys( host.variables ).length ).to.equal(4)   // 4 group vars
         }
     })
 
