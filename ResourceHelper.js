@@ -10,7 +10,7 @@ class ResourceHelper {
     static addShortcuts(inventoryName, resourceType, shortcutConfig, resourceList) {
         for (var resource in resourceList) {
             for(var scIndex in shortcutConfig) {
-                if (shortcutConfig[scIndex]['resource-type'] == resourceType) {
+                if (shortcutConfig[scIndex]['resource-type'] == resourceType || shortcutConfig[scIndex]['resource-type'] == 'all') {
                     var scName = shortcutConfig[scIndex]['name']
                     var path = shortcutConfig[scIndex]['path'].split('/')
                     var func = shortcutConfig[scIndex]['function'] === undefined ? 'copy' : shortcutConfig[scIndex]['function'].toLowerCase()

@@ -39,6 +39,8 @@
         var graphs = []
         var nodeId = 0
 
+        var tooltipLength = 200
+
         function getUrlAttr(group, resourceType, resourceName) {
             var selectedObject = group.inventory+'%3B'+resourceType+'%3B'+resourceName;
             var url = 'index.html?view=Groups&#38;selectedObject='+selectedObject
@@ -58,7 +60,8 @@
                 var url = getUrlAttr(group, 'group', group.name)
                 graphData += 'subgraph cluster_'+groupName+' { '
                 graphData += 'URL="'+url+'"; '
-                graphData += 'fillcolor="#'+cv+'ff'+cv+'"; style=filled; label = "'+group.name+'"; tooltip="'+getVariablesAsTooltip(group.variables)+'"; '
+                graphData += 'fillcolor="#'+cv+'ff'+cv+'"; style=filled; label = "'+group.name+'"; '
+                graphData += 'tooltip="'+getVariablesAsTooltip(group.variables)+'"; '
 
                 // enter hosts
                 group.hostnames.forEach(hostname => {
@@ -66,7 +69,9 @@
                     var nodeName = hostname + (nodeId++)
                     var host = findHost(inventoryName, hostname)
                     graphData += '"'+nodeName+'" [ label="'+hostname+'";' + 'URL="'+url+'"; tooltip="'+url+'"; '
-                    graphData += 'style=filled; shape=rect; fillcolor=lightblue; tooltip="'+getVariablesAsTooltip(host.variables)+'"; ] '
+                    graphData += 'style=filled; shape=rect; fillcolor=lightblue; '
+                    graphData += 'tooltip="'+getVariablesAsTooltip(host.variables)+'"; ' 
+                    graphData += '] \n'
                 })
 
                 group.nodes.forEach(subgroup => {
@@ -79,15 +84,27 @@
             return graphData
         }
 
-        function getVariablesAsTooltip(vars, level=1) {
+        function escapeHtml(unsafe) {
+            return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function getVariablesAsTooltip(vars){
+            var text = getVariablesAsTooltipRec(vars)
+            if (text.length > tooltipLength) {
+                text = text.substring(0, tooltipLength) +'\n...'
+            }
+            return text
+        }
+
+        function getVariablesAsTooltipRec(vars, level=1) {
             var tt = ''
             if (level == 1) tt += 'Variables: \n'
             for(var varName in vars){
                 tt += '\t'.repeat(2*level)+'• '
-                tt += varName+': '
+                tt += escapeHtml(varName)+': '
                 var value = vars[varName]
-                if (typeof value == 'object') tt += '\n' + getVariablesAsTooltip(value, level+1)
-                else tt += value + '\n'
+                if (typeof value == 'object') tt += '\n' + getVariablesAsTooltipRec(value, level+1)
+                else tt += escapeHtml(value) + '\n'
             }
             return tt
         }
@@ -99,7 +116,7 @@
         data['inventories'].forEach(inventory => {
 
             var graphData = 'graph "'+inventory.name+'" { rankdir=LR; splines=False; style=dashed; '
-            graphData += 'subgraph cluster_'+inventory.name+' { style=dashed; label = "'+inventory.name+'"; '
+            graphData += 'subgraph cluster_'+inventory.name.replace(/-/g, '')+' { style=dashed; label = "'+inventory.name+'"; '
             graphData += ' URL="index.html?view=Groups&#38;filter='+inventory.name+'"; '
 
             data['trees'].forEach(group => {

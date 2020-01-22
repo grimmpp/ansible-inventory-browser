@@ -44,8 +44,6 @@ class DataGenerator {
                 Message.create("error", "parser", "parser", inv.name, "parsing error: hosts file format from inventory '"+inv.name+"' unknown.")
             }
     
-            ResourceHelper.addAllShortcuts(inv)
-
             inventories.push(inv)
             data["hosts"].push.apply(data["hosts"], Object.values(inv.flatHostList))
             data["groups"].push.apply(data["groups"], Object.values(inv.flatGroupList))
@@ -57,6 +55,8 @@ class DataGenerator {
     
         data["trees"] = TreeBuilder.build(data["groups"], data["hosts"])
         
+        inventories.forEach(inv => ResourceHelper.addAllShortcuts(inv))
+
         // console.dir(inventories)
         // console.dir(data["hosts"])
         // console.dir(data["groups"])
