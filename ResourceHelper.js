@@ -2,6 +2,11 @@ const Message = require('./Message.js')
 
 class ResourceHelper {
 
+    static addAllShortcuts(inventory) {
+        ResourceHelper.addShortcuts(inventory.name, 'host', inventory.shortcutsConfig, inventory.flatHostList)
+        ResourceHelper.addShortcuts(inventory.name, 'group', inventory.shortcutsConfig, inventory.flatGroupList)
+    }
+
     static addShortcuts(inventory, resourceType, shortcutConfig, resourceList) {
         for (var resource in resourceList) {
             for(var scIndex in shortcutConfig) {
@@ -15,9 +20,11 @@ class ResourceHelper {
 
                     if (func == "copy") {
                         resourceList[resource][scName] = ResourceHelper.getProp(inventory, resourceType, resource, resourceList[resource], path, defaultValue)
-                    } else if(func == "count") {
+                    } 
+                    else if(func == "count") {
                         resourceList[resource][scName] = ResourceHelper.getProp(inventory, resourceType, resource, resourceList[resource], path, defaultValue).length
-                    } else {
+                    }
+                    else {
                         Message.create("error", resourceType, resource, inventory, "Error: unknown function '"+func+"'")
                     }
 
@@ -39,6 +46,7 @@ class ResourceHelper {
             return ""
         }
     }
+
 }
 
 module.exports = ResourceHelper

@@ -44,9 +44,8 @@ class DataGenerator {
                 Message.create("error", "parser", "parser", inv.name, "parsing error: hosts file format from inventory '"+inv.name+"' unknown.")
             }
     
-            ResourceHelper.addShortcuts(inv.name, 'host', inv.shortcutsConfig, inv.flatHostList)
-            ResourceHelper.addShortcuts(inv.name, 'group', inv.shortcutsConfig, inv.flatGroupList)
-       
+            ResourceHelper.addAllShortcuts(inv)
+
             inventories.push(inv)
             data["hosts"].push.apply(data["hosts"], Object.values(inv.flatHostList))
             data["groups"].push.apply(data["groups"], Object.values(inv.flatGroupList))
