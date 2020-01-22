@@ -2,7 +2,7 @@
 
 [leafs]
 leaf01
-leaf02
+leaf02      username="hans peter mueller"     password="test123"
 
 [spines]
 spine01

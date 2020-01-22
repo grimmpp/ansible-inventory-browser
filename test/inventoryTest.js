@@ -77,6 +77,7 @@ describe('#inventoryTest()', function() {
         const hostsWithoutVariables = ['leaf01','leaf02','spine01','spine01','webserver01','webserver02']
         for(var i in hostsWithoutVariables) {
             host = findHostByName(hosts, hostsWithoutVariables[i])
+            console.dir(host)
             expect( Object.keys( host.variables ).length ).to.equal(0)
         }
     })

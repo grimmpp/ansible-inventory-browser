@@ -52,11 +52,13 @@ class Host {
                         }
 
                         // get variables out of the same line like the host name
-                        var variables = Host.removeHostnameOfVariables(hostname +"="+ hostsIni[groupName][hostname])
-                        var splittedVars = variables.split(' ').filter(e => e.length > 0)
+                        var varsString = Host.removeHostnameOfVariables(hostname +"="+ hostsIni[groupName][hostname])
+                        var splittedVars = Host.internal_splitKeyValueVariablePairs(varsString)
 
                         for(var i in splittedVars) {
                             var keyValuePair = splittedVars[i].split('=')
+                            //remove quotes from start and end
+                            if (keyValuePair[1].startsWith('"') && keyValuePair[1].endsWith('"')) keyValuePair[1] = keyValuePair[1].substring(1, keyValuePair[1].length-1)
                             hostList[_hostname].variables[keyValuePair[0]] = keyValuePair[1]
                         }
                     }
@@ -70,6 +72,11 @@ class Host {
         // console.log("Host List: ")
         // console.dir(JSON.parse(JSON.stringify(hostList)), {depth: null, colors: true})
         return hostList
+    }
+
+    static internal_splitKeyValueVariablePairs(variables) {
+        var splittedVars = variables.match(/(?:[^\s"]+|"[^"]*")+/g).filter(e => e.length > 0)
+        return splittedVars
     }
 
     static generateHostListFromYamlFile(inventory) {
