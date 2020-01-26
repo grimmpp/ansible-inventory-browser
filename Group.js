@@ -16,6 +16,7 @@ class Group {
         this.inventory = inventory
         this.environment_label = environment
         this.variables = {}
+        this.findStr = inventory+';'+this.type+';'+this.name
     }
 
     static hasHosts(groupName) {

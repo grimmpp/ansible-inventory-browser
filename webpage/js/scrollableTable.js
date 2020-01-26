@@ -363,7 +363,7 @@ var scrollableTable = function(id, wrapperId, enableLogging=false) {
             rowInfo.tableRow.attr('id', rowInfo.rowId)
             rowInfo.tableRow.attr('level', rowInfo.level)
             rowInfo.tableRow.attr('parentId', rowInfo.parentRowId)
-            rowInfo.tableRow.attr('findStr', rowInfo.dataEntry.inventory+';'+rowInfo.dataEntry.type+';'+rowInfo.dataEntry.name)
+            rowInfo.tableRow.attr('findStr', rowInfo.dataEntry.findStr)
 
             setTableRowVisibility(rowInfo)
 

@@ -65,11 +65,11 @@
         function showJsonData(event, eventData) {
 
             // remove all selections which were added in this function
-            $('.inventoryTableSelectedRow').removeClass('inventoryTableSelectedRow')
+            $('.scrollableTableSelectedRow').removeClass('scrollableTableSelectedRow')
             // set originally selected row again
 
             if (eventData !== undefined) {
-                $('#'+eventData.rowId).addClass('inventoryTableSelectedRow')
+                $('#'+eventData.rowId).addClass('scrollableTableSelectedRow')
             
                 var tempObject = JSON.parse(JSON.stringify(eventData))
                 delete tempObject.data.nodes
@@ -78,7 +78,9 @@
                 if (eventData.data.type == 'host' || eventData.data.type == 'group') {
                     var findStr = eventData.data.inventory+';'+eventData.data.type+';'+eventData.data.name
                     // one host can be in different subtrees to highlight that the same host exists in different subtrees highlight them all.
-                    $('#inventoryTable > tbody > tr[findStr="'+findStr+'"]').addClass('inventoryTableSelectedRow')
+
+                    $('#inventoryTableId > tbody > tr[findStr="'+findStr+'"]').addClass('scrollableTableSelectedRow')
+
                     historyMgr.setParameters({selectedObject: findStr })
 
                     updateVarsTable(eventData)
