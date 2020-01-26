@@ -21,7 +21,8 @@ class TreeBuilder {
         node.nodes = []
         for (var i in node.subgroups) {
             var subnode = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatGroupList, node.inventory, node.subgroups[i]))
-            subnode.variables = Object.assign(subnode.variables, node.variables)
+            // inherit variables
+            // subnode.variables = Object.assign(subnode.variables, node.variables)
             node.nodes.push(subnode)
             TreeBuilder.internal_addSubgroupsToNode(flatGroupList, flatHostList, subnode)
         }
@@ -31,7 +32,8 @@ class TreeBuilder {
             // do not copy host entries because the same host can appear in different subtrees and we want to get all vars inherited. 
             // Futhermore the hosts in the host list will get the vars as well.
             var host = TreeBuilder._internal_findSubnode(flatHostList, node.inventory, node.hostnames[i])
-            host.variables = Object.assign(host.variables, node.variables)
+            // inherit variables
+            // host.variables = Object.assign(host.variables, node.variables)
             node.nodes.push(host)
         }
     }
@@ -42,7 +44,8 @@ class TreeBuilder {
     }
 
     static _internal_cloneObject(obj) {
-        return JSON.parse(JSON.stringify(obj))
+        var node = JSON.parse(JSON.stringify(obj))
+        return node
     }
 
     static internal_sortRootNodes(trees){

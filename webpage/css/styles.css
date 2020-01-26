@@ -11,7 +11,16 @@ body {
   color: #585858;
 }
 
+#wrapperVariablesTable {
+  position: fixed;
+  border: 1px solid darkgrey;
+  top: 20px;
+  height: 400px;
+  left: 821px;
+  right: 20px;
 
+  margin: 0;
+}
 
 #detailView {
   position: fixed;
@@ -21,7 +30,7 @@ body {
   
   padding: 6px;
 
-  top: 60px;
+  top: 460px;
   left: 821px;
   right: 20px;
   bottom: 18px;
@@ -46,11 +55,12 @@ body {
   z-index: 1;
 }
 
-#wrapper {
+#wrapperInventoryTables {
   position: fixed;
   border: 1px solid darkgrey;
   top: 20px;
-  right: 20px;
+  /* right: 20px; */
+  width: 800px;
   bottom: 20px;
   left: 20px;
 

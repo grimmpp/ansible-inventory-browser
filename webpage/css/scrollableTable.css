@@ -4,14 +4,16 @@
   padding-top: 36px;
   background:rgba(169, 211, 240, 0.43);
   top: 39px;
-  left: -1px;
-  width: 800px;
+  margin: -1px;
+  /* left: -1px; */
+  /* width: 800px; */
+  width: 100%;
   display: block;
 }
 
 .scrollableTableContainer {
   overflow-y: scroll;
-  overflow-x: hidden;
+  overflow-x: auto;
   background-color: white;
   border-top: 2px solid black;
 }
@@ -19,6 +21,7 @@
   border-spacing: 0;
   width: 100%;
   background: white;
+  
 }
 
 .scrollableTable tr:first-child td{
@@ -32,8 +35,6 @@
 
   padding: 8px 4px;
   padding-right: 30px;
-
-  cursor: pointer;
 
   font-size: 10pt;
 }
@@ -60,8 +61,6 @@
   background-image: url('unsorted-icon.png');
   background-repeat: no-repeat;
   background-position: center right; /* right will be overwritten by js lib  */
-
-  cursor: pointer;
 }
 
 .scrollableTableCollapsed {

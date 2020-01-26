@@ -40,7 +40,8 @@
         <button id="btGraph2" onclick="location.href='graphView2.html'">Graph View</button>
     </div>
 
-    <div id="wrapper"></div>
+    <div id="wrapperInventoryTables"></div>
+    <div id="wrapperVariablesTable"></div>
     <pre ><code id="detailView" class="lang-JSON" style="background-color: #ddd;" ></code></pre>
 
     <script type="text/javascript">
@@ -48,25 +49,26 @@
         var historyMgr = new HistoryManager({view: 'Hosts', filter: '', selectedObject: ''})
 
         var loggingEnabled = false
-        var scrollableTable = new scrollableTable('scrollableTable', 'wrapper', loggingEnabled)
-        scrollableTable.setTableHeight( () => { return $( window ).height() - 118 } )
+        var inventoryTable = new scrollableTable('inventoryTableId', 'wrapperInventoryTables', loggingEnabled)
+        inventoryTable.setTableHeight( () => { return $( window ).height() - 118 } )
 
-        
         /** Generic function in order to fill table and tree view */
         function updateTable(tableConfig, data) {
-            scrollableTable.setTableHeader(tableConfig['header'])
-            scrollableTable.setTableContent(data, tableConfig['event-type'], tableConfig['columns'], tableConfig['subtreeProperty'])
-            scrollableTable.expandTree()
+            inventoryTable.setTableHeader(tableConfig['header'])
+            inventoryTable.setTableContent(data, tableConfig['event-type'], tableConfig['columns'], tableConfig['subtreeProperty'])
+            inventoryTable.expandTree()
         }
 
         /** generic function which shows the json object in #detailedView */
         function showJsonData(event, eventData) {
-            // remove all selections which were added in this function
-            $('.scrollableTableSelectedRow').removeClass('scrollableTableSelectedRow')
-            // set originally selected row again
-            $('#'+eventData.rowId).addClass('scrollableTableSelectedRow')
 
-            if (eventData != null) {
+            // remove all selections which were added in this function
+            $('.inventoryTableSelectedRow').removeClass('inventoryTableSelectedRow')
+            // set originally selected row again
+
+            if (eventData !== undefined) {
+                $('#'+eventData.rowId).addClass('inventoryTableSelectedRow')
+            
                 var tempObject = JSON.parse(JSON.stringify(eventData))
                 delete tempObject.data.nodes
                 $('#detailView').html( JSON.stringify( tempObject, null, 4) )
@@ -74,8 +76,10 @@
                 if (eventData.data.type == 'host' || eventData.data.type == 'group') {
                     var findStr = eventData.data.inventory+';'+eventData.data.type+';'+eventData.data.name
                     // one host can be in different subtrees to highlight that the same host exists in different subtrees highlight them all.
-                    $('#scrollableTable > tbody > tr[findStr="'+findStr+'"]').addClass('scrollableTableSelectedRow')
+                    $('#inventoryTable > tbody > tr[findStr="'+findStr+'"]').addClass('inventoryTableSelectedRow')
                     historyMgr.setParameters({selectedObject: findStr })
+
+                    updateVarsTable(eventData)
                 }
 
                 // refresh json highlighting
@@ -84,6 +88,7 @@
             else {
                 $('#detailView').html("")
                 historyMgr.setParameters({selectedObject: ''})
+                updateVarsTable()
             }
         }
 
@@ -109,7 +114,7 @@
         $('#btJSON').click( function() {
             refreshView('JSON')
 
-            scrollableTable.clearTableContent()
+            inventoryTable.clearTableContent()
             $('#detailView').html( JSON.stringify( data, null, 4) )
 
             // refresh json highlighting
@@ -121,6 +126,7 @@
             if (historyMgr.getParameter('view') != view) {
                 resetFilterTextField()
                 historyMgr.setParameters({selectedObject: ''})
+                varsTable.clearTableContent()
             }
             
             historyMgr.setParameters({view: view})
@@ -132,6 +138,76 @@
 
             var tableConfig = data['ui-config'][configPart]
             updateTable(tableConfig, data[dataPart])
+        }
+
+
+        /* add vars table */
+
+        var varsTable = new scrollableTable('varsTableId', 'wrapperVariablesTable', true)
+        varsTable.setTableHeight( 400 - 39 )
+        varsTable.setTableHeader(['Resource Name', 'Type', 'Variable Name', 'Variable Value'])
+        varsTable.enableSingleSelect(false)
+
+        function updateVarsTable(eventData=undefined){
+
+            if (eventData !== undefined) {
+                var content = getAllInheritedVariables(eventData.data)
+                varsTable.setTableContent(content, 'varsTableEvent', ['name', 'type', 'var_name', 'var_val'])
+                varsTable.sortByColumnName('Variable Name')
+                varsTable.sortByColumnName('Resource Name')
+            }
+            else {
+                varsTable.setTableContent([], 'varsTableEvent', ['name', 'type', 'var_name', 'var_val'])
+            }
+        }
+
+        function getAllInheritedVariables(childNode) {
+            var node = childNode
+            var content = []
+
+            while (node != null) {
+                content = getNestedVariables(node, node.variables, content)
+                node = findParentNode(data['trees'], node)
+            }
+
+            return content
+        }
+
+        function getNestedVariables(obj, variables, content=[], prefix='') {
+            for (var varName in variables) {
+                if (typeof variables[varName] == 'object') {
+                    getNestedVariables(obj, variables[varName], content, varName+' → ')
+                }
+                else {
+                    content.push({
+                        name: obj.name,
+                        type: obj.type,
+                        var_name: prefix+varName,
+                        var_val: variables[varName]
+                    })
+                } 
+            }
+
+            return content
+        }
+
+        function findParentNode(nodes, childNode) {
+
+            for(var i in nodes) {
+                var n = nodes[i]
+                if (n.nodes !== undefined) {
+                    if (n.inventory == childNode.inventory) {
+                        if (childNode.type == 'host' && n.hostnames.includes(childNode.name)) return n
+                        else if (childNode.type == 'group' && n.subgroups.includes(childNode.name)) return n
+                        else {
+                            var p = findParentNode(n.nodes, childNode)
+                            if (p != null) return p
+                        }
+                    }
+                }
+            }
+
+            return null
         }
 
 
@@ -149,7 +225,7 @@
 
         historyMgr.setHanlder('selectedObject', function(value){
             if (value != '') {
-                var TR = $('#scrollableTable > tbody > tr[findStr="'+value+'"]')
+                var TR = $('#inventoryTableId > tbody > tr[findStr="'+value+'"]')
                 TR.click()
                 TR.get(0).scrollIntoView({block: 'center', inline: 'center'})  // scroll to visible view
             }
@@ -162,7 +238,7 @@
 
         function filter() {
             var value = $('#filterTextField').val()
-            scrollableTable.filter( value )
+            inventoryTable.filter( value )
             historyMgr.setParameters({filter: value})
         }
 
