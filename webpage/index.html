@@ -18,6 +18,7 @@
   <script type="text/javascript" src="generated-data/data.js"></script>
 
   <script type="text/javascript" src="js/HistoryManager.js"></script>
+  <script type="text/javascript" src="js/dataHelper.js"></script>
 
     <!-- https://highlightjs.org/static/demo/ -->
   <link rel="stylesheet" href="js/highlight/styles/googlecode.css">
@@ -151,7 +152,7 @@
         function updateVarsTable(eventData=undefined){
 
             if (eventData !== undefined) {
-                var content = getAllInheritedVariables(eventData.data)
+                var content = DataHelper.getAllInheritedVariablesOfNode(eventData.data)
                 varsTable.setTableContent(content, 'varsTableEvent', ['name', 'type', 'var_name', 'var_val'])
                 varsTable.sortByColumnName('Variable Name')
                 varsTable.sortByColumnName('Resource Name')
@@ -160,57 +161,7 @@
                 varsTable.setTableContent([], 'varsTableEvent', ['name', 'type', 'var_name', 'var_val'])
             }
         }
-
-        function getAllInheritedVariables(childNode) {
-            var node = childNode
-            var content = []
-
-            while (node != null) {
-                content = getNestedVariables(node, node.variables, content)
-                node = findParentNode(data['trees'], node)
-            }
-
-            return content
-        }
-
-        function getNestedVariables(obj, variables, content=[], prefix='') {
-            for (var varName in variables) {
-                if (typeof variables[varName] == 'object') {
-                    getNestedVariables(obj, variables[varName], content, varName+' → ')
-                }
-                else {
-                    content.push({
-                        name: obj.name,
-                        type: obj.type,
-                        var_name: prefix+varName,
-                        var_val: variables[varName]
-                    })
-                } 
-            }
-
-            return content
-        }
-
-        function findParentNode(nodes, childNode) {
-
-            for(var i in nodes) {
-                var n = nodes[i]
-                if (n.nodes !== undefined) {
-                    if (n.inventory == childNode.inventory) {
-                        if (childNode.type == 'host' && n.hostnames.includes(childNode.name)) return n
-                        else if (childNode.type == 'group' && n.subgroups.includes(childNode.name)) return n
-                        else {
-                            var p = findParentNode(n.nodes, childNode)
-                            if (p != null) return p
-                        }
-                    }
-                }
-            }
-
-            return null
-        }
-
-
+        
         /* set history handler */
 
         /* after loading a page with url parameters it pushes a button in order to call a view */
