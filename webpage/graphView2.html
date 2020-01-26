@@ -16,6 +16,7 @@
 
   <!-- pre-generated data which originally comes from the inventories -->
   <script type="text/javascript" src="generated-data/data.js"></script>
+  <script type="text/javascript" src="js/DataHelper.js"></script>
 
   <!-- https://github.com/mdaines/viz.js -->
   <!-- https://github.com/mdaines/viz.js/wiki/Usage -->
@@ -35,6 +36,8 @@
     <table id="graphs"><tr></tr></table>
 
     <script>
+        DataHelper.initData()
+        
         var viz = new Viz();
         var graphs = []
         var nodeId = 0

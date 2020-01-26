@@ -1,5 +1,17 @@
     class DataHelper {
 
+        static initData(){
+            DataHelper.initTreeList()
+            DataHelper.initGlobalHostsList()
+        }
+
+        static initTreeList() {
+            data['trees'] = []
+            data['inventories'].forEach(inv => {
+                inv['tree'].forEach(n => data['trees'].push(n))
+            })
+        }
+
         static initGlobalHostsList() {
             data['hosts'] = []
             data['trees'].forEach(n => DataHelper.addHostToList(n, data['hosts']) )

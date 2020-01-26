@@ -57,6 +57,16 @@ class DataGenerator {
         
         inventories.forEach(inv => ResourceHelper.addAllShortcuts(inv))
 
+        inventories.forEach(inv => {
+            delete inv['flatHostList']
+            delete inv['flatGroupList']
+
+            inv['tree'] = []
+            data['trees'].forEach(n => {
+                if(n.inventory == inv.name) inv['tree'].push(n)
+            })
+        })
+        delete data['trees']
         delete data['hosts']
         delete data['groups']
 
