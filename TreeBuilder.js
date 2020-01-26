@@ -5,7 +5,7 @@ class TreeBuilder {
         
         for(var i in flatGroupList) {
             if (flatGroupList[i].name == 'all' || flatGroupList[i].name == 'ungrouped') {
-                var node = TreeBuilder._internal_cloneObject(flatGroupList[i])
+                var node = flatGroupList[i]
                 TreeBuilder.internal_addSubgroupsToNode(flatGroupList, flatHostList, node)
                 trees.push( node )
             }
@@ -20,7 +20,7 @@ class TreeBuilder {
 
         node.nodes = []
         for (var i in node.subgroups) {
-            var subnode = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatGroupList, node.inventory, node.subgroups[i]))
+            var subnode = TreeBuilder._internal_findSubnode(flatGroupList, node.inventory, node.subgroups[i])
             // inherit variables
             // subnode.variables = Object.assign(subnode.variables, node.variables)
             node.nodes.push(subnode)
@@ -28,7 +28,6 @@ class TreeBuilder {
         }
 
         for (var i in node.hostnames) {
-            // var host = TreeBuilder._internal_cloneObject(TreeBuilder._internal_findSubnode(flatHostList, node.inventory, node.hostnames[i]))
             // do not copy host entries because the same host can appear in different subtrees and we want to get all vars inherited. 
             // Futhermore the hosts in the host list will get the vars as well.
             var host = TreeBuilder._internal_findSubnode(flatHostList, node.inventory, node.hostnames[i])

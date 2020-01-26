@@ -39,7 +39,7 @@
         static getNestedVariables(obj, variables, content=[], prefix='') {
             for (var varName in variables) {
                 if (typeof variables[varName] == 'object') {
-                    DataHelper.getNestedVariables(obj, variables[varName], content, varName+' → ')
+                    DataHelper.getNestedVariables(obj, variables[varName], content, prefix+varName+' → ')
                 }
                 else {
                     content.push({
