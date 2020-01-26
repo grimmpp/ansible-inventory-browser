@@ -57,6 +57,9 @@ class DataGenerator {
         
         inventories.forEach(inv => ResourceHelper.addAllShortcuts(inv))
 
+        delete data['hosts']
+        delete data['groups']
+
         // console.dir(inventories)
         // console.dir(data["hosts"])
         // console.dir(data["groups"])

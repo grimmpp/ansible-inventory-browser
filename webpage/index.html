@@ -18,7 +18,7 @@
   <script type="text/javascript" src="generated-data/data.js"></script>
 
   <script type="text/javascript" src="js/HistoryManager.js"></script>
-  <script type="text/javascript" src="js/dataHelper.js"></script>
+  <script type="text/javascript" src="js/DataHelper.js"></script>
 
     <!-- https://highlightjs.org/static/demo/ -->
   <link rel="stylesheet" href="js/highlight/styles/googlecode.css">
@@ -46,6 +46,7 @@
     <pre ><code id="detailView" class="lang-JSON" style="background-color: #ddd;" ></code></pre>
 
     <script type="text/javascript">
+        DataHelper.initGlobalHostsList()
         
         var historyMgr = new HistoryManager({view: 'Hosts', filter: '', selectedObject: ''})
 
