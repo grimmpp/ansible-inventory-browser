@@ -57,6 +57,7 @@ class DataGenerator {
         
         inventories.forEach(inv => ResourceHelper.addAllShortcuts(inv))
 
+        // remove unneeded and duplicated entries
         inventories.forEach(inv => {
             delete inv['flatHostList']
             delete inv['flatGroupList']

@@ -24,22 +24,22 @@
             }
         }
 
-        static getAllInheritedVariablesOfNode(childNode) {
+        static getAllInheritedVariableListOfNode(childNode) {
             var node = childNode
             var content = []
 
             while (node != null) {
-                content = DataHelper.getNestedVariables(node, node.variables, content)
+                content = DataHelper.getNestedVariablesAsList(node, node.variables, content)
                 node = DataHelper.findParentNode(node)
             }
 
             return content
         }
 
-        static getNestedVariables(obj, variables, content=[], prefix='') {
+        static getNestedVariablesAsList(obj, variables, content=[], prefix='') {
             for (var varName in variables) {
                 if (typeof variables[varName] == 'object') {
-                    DataHelper.getNestedVariables(obj, variables[varName], content, prefix+varName+' → ')
+                    DataHelper.getNestedVariablesAsList(obj, variables[varName], content, prefix + varName+' → ')
                 }
                 else {
                     content.push({
@@ -52,6 +52,31 @@
             }
 
             return content
+        }
+
+        static getAllInheritedVariableTreeOfNode(childNode) {
+            var node = childNode
+            var tree = []
+
+            while (node != null) {
+                DataHelper.getNestedVariablesAsTree(node, node.variables, tree)
+                node = DataHelper.findParentNode(node)
+            }
+
+            return tree
+        }
+
+        static getNestedVariablesAsTree(obj, variables, subNodeList) {
+            for (var varName in variables) {
+                var node = {name: obj.name, type: obj.type, var_name: varName, var_val: '', nodes: [] }
+                if (typeof variables[varName] == 'object') {
+                    DataHelper.getNestedVariablesAsTree(obj, variables[varName], node.nodes)
+                }
+                else {
+                    node.var_val = variables[varName]
+                }
+                subNodeList.push(node)
+            }
         }
 
         static findParentNode(childNode, nodes = data['trees']) {

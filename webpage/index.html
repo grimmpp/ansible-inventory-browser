@@ -153,19 +153,20 @@
 
         var varsTable = new scrollableTable('varsTableId', 'wrapperVariablesTable', true)
         varsTable.setTableHeight( 400 - 39 )
-        varsTable.setTableHeader(['Resource Name', 'Type', 'Variable Name', 'Variable Value'])
+        varsTable.setTableHeader(['Variable Name', 'Variable Value', 'Resource Name', 'Type'])
         varsTable.enableSingleSelect(false)
 
         function updateVarsTable(eventData=undefined){
 
             if (eventData !== undefined) {
-                var content = DataHelper.getAllInheritedVariablesOfNode(eventData.data)
-                varsTable.setTableContent(content, 'varsTableEvent', ['name', 'type', 'var_name', 'var_val'])
+                var varsAsTree = DataHelper.getAllInheritedVariableTreeOfNode(eventData.data)
+                varsTable.setTableContent(varsAsTree, 'varsTableEvent', ['var_name', 'var_val', 'name', 'type'], 'nodes')
+                varsTable.expandTree()
                 varsTable.sortByColumnName('Variable Name')
-                varsTable.sortByColumnName('Resource Name')
+                // varsTable.sortByColumnName('Resource Name')
             }
             else {
-                varsTable.setTableContent([], 'varsTableEvent', ['name', 'type', 'var_name', 'var_val'])
+                varsTable.setTableContent([], 'varsTableEvent', ['var_name', 'var_val', 'name', 'type'])
             }
         }
         
