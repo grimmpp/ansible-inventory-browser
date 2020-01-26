@@ -116,8 +116,14 @@
         $('#btJSON').click( function() {
             refreshView('JSON')
 
+            var displayData = {}
+            // displayData['trees'] = data['trees']
+            displayData['messages'] = data['messages']
+            displayData['ui-config'] = data['ui-config']
+            displayData['inventories'] = data['inventories']
+
             inventoryTable.clearTableContent()
-            $('#detailView').html( JSON.stringify( data, null, 4) )
+            $('#detailView').html( JSON.stringify( displayData, null, 4) )
 
             // refresh json highlighting
             hljs.highlightBlock( document.getElementById('detailView') )
