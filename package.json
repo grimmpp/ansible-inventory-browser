@@ -12,11 +12,11 @@
     "chai-arrays": "^2.0.0",
     "chai-string": "^1.5.0",
     "express": "^4.17.1",
-    "mocha": "^6.2.2",
+    "mocha": "^6.2.3",
     "read-ini-file": "^2.0.0",
     "viz.js": "^2.1.2",
-    "yaml": "^1.7.2",
-    "yargs": "^15.0.2"
+    "yaml": "^1.8.3",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {},
   "scripts": {
